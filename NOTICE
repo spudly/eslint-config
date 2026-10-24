@@ -1,0 +1,47 @@
+# NOTICE
+
+## Vendored code: eslint-plugin-react-native
+
+The React Native ESLint rules in `src/react-native-plugin/` are vendored
+from **eslint-plugin-react-native 5.0.0**
+(https://github.com/intellicode/eslint-plugin-react-native), used under
+the MIT License:
+
+```
+The MIT License (MIT)
+
+Copyright (c) 2015 Tom Hastjarjanto
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
+Rule authors, as recorded in the upstream sources: Tom Hastjarjanto,
+Aaron Greenwald, Alex Zhukov, Michael Gall, Mats Byrkjeland, and
+Yannick Croissant (component-detection utilities, originally from
+eslint-plugin-react).
+
+Modifications from upstream: the code was ported from CommonJS
+JavaScript to TypeScript ES modules, and the rule-context APIs removed
+in ESLint 9/10 were adapted (`context.getSourceCode()` ->
+`context.sourceCode`, `context.getFilename()` -> `context.filename`,
+`context.getScope()` fallbacks dropped in favor of
+`context.sourceCode.getScope(node)`). Upstream's legacy
+`environments.react-native` globals were not ported (no consumer used
+them). Behavior is otherwise intended to be identical, and the unit
+tests exercise every vendored rule on ESLint 10.
