@@ -81,6 +81,7 @@
     "build": "tsc -p tsconfig.json",
     "changeset": "changeset",
     "clean": "rm -rf dist",
+    "check-rules": "npm run build && node scripts/checkRules.mjs",
     "lint": "eslint .",
     "prepublishOnly": "npm run build",
     "prettier:check": "prettier --check .",

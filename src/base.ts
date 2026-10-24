@@ -268,104 +268,7 @@ const baseCore: Linter.Config[] = [
       'no-restricted-globals': 'off', // no specific global variable restrictions
       'no-restricted-properties': 'off', // no specific property access restrictions
       'no-unassigned-vars': 'off', // TypeScript handles unused variable declarations
-      'prefer-object-has-own': 'off', // superseded by unicorn/prefer-object-has-own
-      // ── Deprecated rules — handled by Prettier or superseded ───────────────
-      // All deprecated rules are off. Formatting-related ones are also disabled
-      // by eslint-config-prettier (section 9).
-      'array-bracket-newline': 'off', // deprecated; handled by Prettier
-      'array-bracket-spacing': 'off', // deprecated; handled by Prettier
-      'array-element-newline': 'off', // deprecated; handled by Prettier
-      'arrow-parens': 'off', // deprecated; handled by Prettier
-      'arrow-spacing': 'off', // deprecated; handled by Prettier
-      'block-spacing': 'off', // deprecated; handled by Prettier
-      'brace-style': 'off', // deprecated; handled by Prettier
-      'callback-return': 'off', // deprecated; we don't use callback-style async
-      'comma-dangle': 'off', // deprecated; handled by Prettier
-      'comma-spacing': 'off', // deprecated; handled by Prettier
-      'comma-style': 'off', // deprecated; handled by Prettier
-      'computed-property-spacing': 'off', // deprecated; handled by Prettier
-      'dot-location': 'off', // deprecated; handled by Prettier
-      'eol-last': 'off', // deprecated; handled by Prettier
-      'func-call-spacing': 'off', // deprecated; handled by Prettier
-      'function-call-argument-newline': 'off', // deprecated; handled by Prettier
-      'function-paren-newline': 'off', // deprecated; handled by Prettier
-      'generator-star-spacing': 'off', // deprecated; handled by Prettier
-      'global-require': 'off', // deprecated; superseded by import-x/no-commonjs
-      'handle-callback-err': 'off', // deprecated; we don't use callback-style async
-      'id-blacklist': 'off', // deprecated; superseded by id-denylist
-      'implicit-arrow-linebreak': 'off', // deprecated; handled by Prettier
-      'indent': 'off', // deprecated; handled by Prettier
-      'indent-legacy': 'off', // deprecated; handled by Prettier
-      'jsx-quotes': 'off', // deprecated; handled by Prettier
-      'key-spacing': 'off', // deprecated; handled by Prettier
-      'keyword-spacing': 'off', // deprecated; handled by Prettier
-      'line-comment-position': 'off', // deprecated; comment placement is flexible
-      'linebreak-style': 'off', // deprecated; handled by Prettier (endOfLine: lf)
-      'lines-around-comment': 'off', // deprecated; handled by Prettier
-      'lines-around-directive': 'off', // deprecated; handled by Prettier
-      'lines-between-class-members': 'off', // deprecated; no classes
-      'max-len': 'off', // deprecated; handled by Prettier (printWidth: 80)
-      'max-statements-per-line': 'off', // deprecated; handled by Prettier
-      'mixed-operators': 'off', // deprecated (was no-mixed-operators); handled by Prettier
-      'multiline-comment-style': 'off', // deprecated; comment style is not enforced
-      'multiline-ternary': 'off', // deprecated; handled by Prettier
-      'new-parens': 'off', // deprecated; handled by Prettier
-      'newline-after-var': 'off', // deprecated; handled by Prettier
-      'newline-before-return': 'off', // deprecated; handled by Prettier
-      'newline-per-chained-call': 'off', // deprecated; handled by Prettier
-      'no-buffer-constructor': 'off', // deprecated; superseded by n/no-deprecated-api
-      'no-catch-shadow': 'off', // deprecated; TypeScript prevents variable shadowing
-      'no-confusing-arrow': 'off', // deprecated; handled by Prettier
-      'no-extra-parens': 'off', // deprecated; handled by Prettier
-      'no-extra-semi': 'off', // deprecated; handled by Prettier
-      'no-floating-decimal': 'off', // deprecated; handled by Prettier
-      'no-mixed-operators': 'off', // deprecated; handled by Prettier
-      'no-mixed-requires': 'off', // deprecated; we don't use require
-      'no-mixed-spaces-and-tabs': 'off', // deprecated; handled by Prettier
-      'no-multi-spaces': 'off', // deprecated; handled by Prettier
-      'no-multiple-empty-lines': 'off', // deprecated; handled by Prettier
-      'no-native-reassign': 'off', // deprecated; superseded by no-global-assign
-      'no-negated-in-lhs': 'off', // deprecated; superseded by no-unsafe-negation
-      'no-new-object': 'off', // deprecated; superseded by no-object-constructor
-      'no-new-require': 'off', // deprecated; we don't use require
-      'no-new-symbol': 'off', // deprecated; superseded by no-new-native-nonconstructor
-      'no-path-concat': 'off', // deprecated; superseded by n/no-path-concat (also off)
-      'no-process-env': 'off', // deprecated; we access process.env intentionally
-      'no-process-exit': 'off', // deprecated; superseded by n/no-process-exit (on for server)
-      'no-restricted-modules': 'off', // deprecated; superseded by no-restricted-imports
-      'no-return-await': 'off', // deprecated; superseded by @typescript-eslint/return-await
-      'no-spaced-func': 'off', // deprecated; handled by Prettier
-      'no-sync': 'off', // deprecated; superseded by n/no-sync
-      'no-tabs': 'off', // deprecated; handled by Prettier
-      'no-trailing-spaces': 'off', // deprecated; handled by Prettier
-      'no-whitespace-before-property': 'off', // deprecated; handled by Prettier
-      'nonblock-statement-body-position': 'off', // deprecated; handled by Prettier
-      'object-curly-newline': 'off', // deprecated; handled by Prettier
-      'object-curly-spacing': 'off', // deprecated; handled by Prettier
-      'object-property-newline': 'off', // deprecated; handled by Prettier
-      'one-var-declaration-per-line': 'off', // deprecated; handled by Prettier
-      'operator-linebreak': 'off', // deprecated; handled by Prettier
-      'padded-blocks': 'off', // deprecated; handled by Prettier
-      'padding-line-between-statements': 'off', // deprecated; handled by Prettier
-      'prefer-reflect': 'off', // deprecated; Reflect API is not universally preferred
-      'quote-props': 'off', // deprecated; handled by Prettier (quoteProps: consistent)
-      'quotes': 'off', // deprecated; handled by Prettier (singleQuote: true)
-      'rest-spread-spacing': 'off', // deprecated; handled by Prettier
-      'semi': 'off', // deprecated; handled by Prettier (semi: true)
-      'semi-spacing': 'off', // deprecated; handled by Prettier
-      'semi-style': 'off', // deprecated; handled by Prettier
-      'space-before-blocks': 'off', // deprecated; handled by Prettier
-      'space-before-function-paren': 'off', // deprecated; handled by Prettier
-      'space-in-parens': 'off', // deprecated; handled by Prettier
-      'space-infix-ops': 'off', // deprecated; handled by Prettier
-      'space-unary-ops': 'off', // deprecated; handled by Prettier
-      'spaced-comment': 'off', // deprecated; comment spacing is not enforced
-      'switch-colon-spacing': 'off', // deprecated; handled by Prettier
-      'template-curly-spacing': 'off', // deprecated; handled by Prettier
-      'template-tag-spacing': 'off', // deprecated; handled by Prettier
-      'wrap-iife': 'off', // deprecated; handled by Prettier
-      'wrap-regex': 'off', // deprecated; handled by Prettier
-      'yield-star-spacing': 'off', // deprecated; handled by Prettier
+      'prefer-object-has-own': 'off', // not enforced (its former unicorn replacement was removed upstream in unicorn 65)
     },
   },
 
@@ -424,7 +327,6 @@ const eslintComments: Linter.Config[] = [
       'eslint-comments/no-duplicate-disable': 'error',
       'eslint-comments/no-restricted-disable': 'off', // no restricted rules
       'eslint-comments/no-unlimited-disable': 'off', // unicorn/no-abusive-eslint-disable already requires rule names
-      'eslint-comments/no-unused-disable': 'off', // was handled by reportUnusedDisableDirectives / --max-warnings 0; that reporting is itself off while typescript-eslint is uninstalled (see the linterOptions block at the top)
       'eslint-comments/no-unused-enable': 'error',
       'eslint-comments/no-use': 'off', // disables are allowed; we just require descriptions
       'eslint-comments/require-description': 'error', // every disable must explain why -- like this

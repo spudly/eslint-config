@@ -31,7 +31,6 @@ export const importX: Linter.Config[] = [
       'import-x/extensions': 'off', // TypeScript and Metro handle extension resolution
       'import-x/first': 'error',
       'import-x/group-exports': 'off', // stylistic preference; not enforced
-      'import-x/imports-first': 'off', // deprecated alias for import-x/first
       'import-x/max-dependencies': 'off', // too strict; large modules are split by max-lines instead
       'import-x/named': 'off', // TypeScript checks named export compatibility
       'import-x/namespace': 'off', // TypeScript checks namespace import compatibility

@@ -15,7 +15,6 @@ export const unicorn: Linter.Config[] = [
     files: ['**/*.{ts,tsx,js,jsx,cjs,mjs}'],
     plugins: {unicorn: unicornPlugin},
     rules: {
-      'unicorn/better-regex': 'off', // auto-fix can change regex semantics unexpectedly
       'unicorn/catch-error-name': 'error',
       'unicorn/consistent-destructuring': 'off', // too opinionated; mixed destructuring is often clearer
       'unicorn/consistent-empty-array-spread': 'error',
@@ -39,30 +38,24 @@ export const unicorn: Linter.Config[] = [
           ],
         },
       ],
-      'unicorn/import-index': 'off', // deprecated rule
       'unicorn/import-style': 'off', // too opinionated about named vs default vs namespace imports
       'unicorn/new-for-builtins': 'error',
       'unicorn/no-abusive-eslint-disable': 'error',
       'unicorn/no-anonymous-default-export': 'off', // React components often use anonymous arrow functions
       'unicorn/no-array-callback-reference': 'off', // too strict; point-free style is valid functional programming
       'unicorn/no-array-for-each': 'error',
-      'unicorn/no-array-instanceof': 'off', // deprecated rule; replaced by no-instanceof-array
       'unicorn/no-array-method-this-argument': 'error',
-      'unicorn/no-array-push-push': 'error',
       'unicorn/no-array-reduce': 'off', // reduce is valid functional programming; we allow it
       'unicorn/no-await-expression-member': 'error',
       'unicorn/no-await-in-promise-methods': 'error',
       'unicorn/no-console-spaces': 'error',
       'unicorn/no-document-cookie': 'off', // no browser/DOM code in this project
       'unicorn/no-empty-file': 'error',
-      'unicorn/no-fn-reference-in-iterator': 'off', // deprecated rule
       'unicorn/no-for-loop': 'error',
       'unicorn/no-hex-escape': 'error',
-      'unicorn/no-instanceof-array': 'error',
       'unicorn/no-invalid-fetch-options': 'off', // no browser fetch API usage in this project
       'unicorn/no-invalid-remove-event-listener': 'off', // no DOM event listener code in this project
       'unicorn/no-keyword-prefix': 'off', // too opinionated; `newItem` and `classNames` are valid names
-      'unicorn/no-length-as-slice-end': 'error',
       'unicorn/no-lonely-if': 'error',
       'unicorn/no-magic-array-flat-depth': 'error',
       'unicorn/no-negated-condition': 'error',
@@ -73,7 +66,6 @@ export const unicorn: Linter.Config[] = [
       'unicorn/no-null': 'off', // null is a valid value in database records and API responses
       'unicorn/no-object-as-default-parameter': 'error',
       'unicorn/no-process-exit': 'off', // handled by n/no-process-exit in the server section
-      'unicorn/no-reduce': 'off', // deprecated rule; replaced by no-array-reduce
       'unicorn/no-single-promise-in-promise-methods': 'error',
       'unicorn/no-static-only-class': 'error',
       'unicorn/no-thenable': 'error',
@@ -83,7 +75,6 @@ export const unicorn: Linter.Config[] = [
       'unicorn/no-unnecessary-polyfills': 'off', // not using polyfills
       'unicorn/no-unreadable-array-destructuring': 'error',
       'unicorn/no-unreadable-iife': 'error',
-      'unicorn/no-unsafe-regex': 'off', // too noisy; complex regexes are sometimes intentional
       'unicorn/no-unused-properties': 'off', // too noisy with TypeScript types and interface declarations
       'unicorn/no-useless-fallback-in-spread': 'error',
       'unicorn/no-useless-length-check': 'error',
@@ -103,21 +94,15 @@ export const unicorn: Linter.Config[] = [
       'unicorn/prefer-at': 'error',
       'unicorn/prefer-blob-reading-methods': 'off', // no browser Blob API in this project
       'unicorn/prefer-code-point': 'error',
-      'unicorn/prefer-dataset': 'off', // no DOM data attributes in this project
       'unicorn/prefer-date-now': 'error',
       'unicorn/prefer-default-parameters': 'error',
       'unicorn/prefer-dom-node-append': 'off', // no DOM manipulation in this project
-      'unicorn/prefer-dom-node-dataset': 'off', // no DOM data attributes in this project
       'unicorn/prefer-dom-node-remove': 'off', // no DOM manipulation in this project
       'unicorn/prefer-dom-node-text-content': 'off', // no DOM text content in this project
-      'unicorn/prefer-event-key': 'off', // deprecated rule
       'unicorn/prefer-event-target': 'off', // no DOM event handling in this project
-      'unicorn/prefer-exponentiation-operator': 'off', // deprecated rule
       'unicorn/prefer-export-from': 'error',
-      'unicorn/prefer-flat-map': 'off', // deprecated rule; replaced by prefer-array-flat-map
       'unicorn/prefer-global-this': 'off', // no cross-environment global access needed
       'unicorn/prefer-includes': 'error',
-      'unicorn/prefer-json-parse-buffer': 'off', // we don't parse JSON from Buffers
       'unicorn/prefer-keyboard-event-key': 'off', // no keyboard event handling in this project
       'unicorn/prefer-logical-operator-over-ternary': 'error',
       'unicorn/prefer-math-min-max': 'error',
@@ -127,22 +112,17 @@ export const unicorn: Linter.Config[] = [
       'unicorn/prefer-module': 'error',
       'unicorn/prefer-native-coercion-functions': 'error',
       'unicorn/prefer-negative-index': 'error',
-      'unicorn/prefer-node-append': 'off', // deprecated rule
       'unicorn/prefer-node-protocol': 'error',
-      'unicorn/prefer-node-remove': 'off', // deprecated rule
       'unicorn/prefer-number-properties': 'error',
       'unicorn/prefer-object-from-entries': 'error',
-      'unicorn/prefer-object-has-own': 'off', // Object.prototype.hasOwnProperty is explicit and familiar
       'unicorn/prefer-optional-catch-binding': 'error',
       'unicorn/prefer-prototype-methods': 'error',
       'unicorn/prefer-query-selector': 'off', // no DOM code in this project
       'unicorn/prefer-reflect-apply': 'off', // too opinionated; fn.apply is readable and common
       'unicorn/prefer-regexp-test': 'error',
-      'unicorn/prefer-replace-all': 'off', // deprecated rule; replaced by prefer-string-replace-all
       'unicorn/prefer-set-has': 'error',
       'unicorn/prefer-set-size': 'error',
       'unicorn/prefer-spread': 'error',
-      'unicorn/prefer-starts-ends-with': 'off', // deprecated rule; replaced by prefer-string-starts-ends-with
       'unicorn/prefer-string-raw': 'error',
       'unicorn/prefer-string-replace-all': 'error',
       'unicorn/prefer-string-slice': 'error',
@@ -151,12 +131,9 @@ export const unicorn: Linter.Config[] = [
       'unicorn/prefer-structured-clone': 'off', // no complex object cloning needed in this project
       'unicorn/prefer-switch': 'error',
       'unicorn/prefer-ternary': 'error',
-      'unicorn/prefer-text-content': 'off', // deprecated rule
       'unicorn/prefer-top-level-await': 'off', // not compatible with Jest test environment and some RN bootstrap patterns
-      'unicorn/prefer-trim-start-end': 'off', // deprecated rule; replaced by prefer-string-trim-start-end
       'unicorn/prefer-type-error': 'error',
       'unicorn/prevent-abbreviations': 'off', // too aggressive; blocks common patterns like req, res, params, fn, i
-      'unicorn/regex-shorthand': 'off', // deprecated rule
       'unicorn/relative-url-style': 'error',
       'unicorn/require-array-join-separator': 'error',
       'unicorn/require-number-to-fixed-digits-argument': 'error',
@@ -197,7 +174,7 @@ export const unicorn: Linter.Config[] = [
       'unicorn/no-exports-in-scripts': 'off',
       'unicorn/no-immediate-mutation': 'off',
       'unicorn/no-incorrect-query-selector': 'off',
-      'unicorn/no-instanceof-builtins': 'off',
+      'unicorn/no-instanceof-builtins': 'error', // successor to 'unicorn/no-instanceof-array' (deprecated in unicorn 65; covers more cases) — kept at 'error' to preserve its enforcement
       'unicorn/no-invalid-file-input-accept': 'off',
       'unicorn/no-late-current-target-access': 'off',
       'unicorn/no-manually-wrapped-comments': 'off',
@@ -206,7 +183,7 @@ export const unicorn: Linter.Config[] = [
       'unicorn/no-unnecessary-array-flat-depth': 'off',
       'unicorn/no-unnecessary-array-splice-count': 'off',
       'unicorn/no-unnecessary-nested-ternary': 'off',
-      'unicorn/no-unnecessary-slice-end': 'off',
+      'unicorn/no-unnecessary-slice-end': 'error', // successor to 'unicorn/no-length-as-slice-end' (deprecated in unicorn 65; covers more cases) — kept at 'error' to preserve its enforcement
       'unicorn/no-unused-array-method-return': 'off',
       'unicorn/no-useless-collection-argument': 'off',
       'unicorn/no-useless-error-capture-stack-trace': 'off',
@@ -225,7 +202,7 @@ export const unicorn: Linter.Config[] = [
       'unicorn/prefer-queue-microtask': 'off',
       'unicorn/prefer-response-static-json': 'off',
       'unicorn/prefer-simple-condition-first': 'off',
-      'unicorn/prefer-single-call': 'off',
+      'unicorn/prefer-single-call': 'error', // successor to 'unicorn/no-array-push-push' (deprecated in unicorn 65; covers more cases) — kept at 'error' to preserve its enforcement
       'unicorn/prefer-split-limit': 'off',
       'unicorn/prefer-string-match-all': 'off',
       'unicorn/prefer-string-pad-start-end': 'off',
