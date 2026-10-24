@@ -4,9 +4,14 @@ import type {Linter} from 'eslint';
 /**
  * import-x rules for all packages.
  *
- * Ported from section 3 of Eciperay's eslint.config.ts (plus the 8b
- * web/client no-cycle relaxation, generalized to web/client directories).
- * Every rule is explicitly configured with its rationale inline.
+ * Ported from section 3 of Eciperay's eslint.config.ts. Every rule is
+ * explicitly configured with its rationale inline.
+ *
+ * Eciperay's section 8b relaxation (`import-x/no-cycle` off for its
+ * web/client packages) is NOT ported: it is scoped to one repo's
+ * directory layout, and this package carries no repo-layout `files:`
+ * globs (Stephen, 2026-10-24). That override belongs in Eciperay's
+ * own config.
  */
 export const importX: Linter.Config[] = [
   {
@@ -79,12 +84,6 @@ export const importX: Linter.Config[] = [
       'import-x/prefer-namespace-import': 'off', // named imports are preferred over namespace imports
       'import-x/unambiguous': 'off', // not all files need to be explicit ES modules (e.g. config files)
     },
-  },
-
-  // ─── 8b. import-x — web/client (Vite workspace resolution) ─────────────
-  {
-    files: ['**/{web,client}/**/*.{ts,tsx,js,jsx}'],
-    rules: {'import-x/no-cycle': 'off'},
   },
 ];
 

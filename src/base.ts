@@ -3,13 +3,28 @@ import prettier from 'eslint-config-prettier';
 import globals from 'globals';
 import type {Linter} from 'eslint';
 
+import coverageIgnore from './coverage-ignore.js';
+import importX from './import-x.js';
+import unicorn from './unicorn.js';
+
 /**
- * Base config: the core ESLint rule set, the JS-file re-enables, the
- * eslint-comments discipline rules, and eslint-config-prettier (last).
+ * Base config: everything every Spudly repo shares, in one array --
+ * the core ESLint rule set, the JS-file re-enables, import-x, unicorn,
+ * the CommonJS config-file overrides, the eslint-comments discipline
+ * rules, the coverage-ignore discipline rule, and
+ * eslint-config-prettier (last).
  *
- * Ported from sections 1, 1b, 11, and 13 of Eciperay's eslint.config.ts.
- * Every core rule is explicitly configured with the rationale recorded
- * inline, exactly as in the source config.
+ * Ported from sections 1, 1b, 3, 4, 4a, 10, 11, and 13 of Eciperay's
+ * eslint.config.ts. Every rule is explicitly configured with the
+ * rationale recorded inline, exactly as in the source config.
+ *
+ * The import-x / unicorn / CommonJS-overrides / coverage-ignore pieces
+ * used to be separate exports; Stephen directed (2026-10-24) that they
+ * fold into `base` so consumers compose a handful of exports, not a
+ * dozen. Rule groups that need DIRECTORY scoping (the `node` server
+ * rules) deliberately stay OUT of `base`: this package carries no
+ * repo-layout `files:` globs, so scoped groups remain their own
+ * exports and each consuming repo attaches its own paths.
  *
  * This export intentionally does NOT include the global TypeScript
  * ignores: until typescript-eslint supports TypeScript 7, TS files are
@@ -17,7 +32,7 @@ import type {Linter} from 'eslint';
  * `typescriptPendingIgnores` from '@spudly/eslint-config/typescript'
  * (see the README for the restore path).
  */
-export const base: Linter.Config[] = [
+const baseCore: Linter.Config[] = [
   {
     // typescript-eslint is uninstalled pending its TS7 support. Its rules
     // are gone, so the inline eslint-disable directives naming
@@ -376,7 +391,28 @@ export const base: Linter.Config[] = [
       'require-await': 'error',
     },
   },
+];
 
+/**
+ * CommonJS config-file overrides (section 4a of Eciperay's config).
+ *
+ * Metro, Babel, and Jest config files use CommonJS (`require` /
+ * `module.exports`). Section 1b re-enables `no-undef` for .js/.cjs/.mjs;
+ * Node globals cover `require`, `module`, and `process` here.
+ *
+ * Internal to `base`: it must come AFTER the import-x and unicorn
+ * sections inside the base array, which is why `base` is composed at
+ * the bottom of this file rather than being a single literal.
+ */
+const commonjsOverrides: Linter.Config[] = [
+  {
+    files: ['**/*.cjs'],
+    languageOptions: {globals: globals.node},
+    rules: {'import-x/no-commonjs': 'off', 'unicorn/prefer-module': 'off'},
+  },
+];
+
+const eslintComments: Linter.Config[] = [
   // ─── 11. eslint-comments — require a reason on every inline disable ────────
   // Enforces `// eslint-disable-next-line rule -- reason` so suppressions are
   // always self-documenting. Applies everywhere.
@@ -394,28 +430,23 @@ export const base: Linter.Config[] = [
       'eslint-comments/require-description': 'error', // every disable must explain why -- like this
     },
   },
-
-  // ─── 13. Prettier — last, disables formatting conflicts ───────────────────
-  prettier,
 ];
 
 /**
- * CommonJS config-file overrides (section 4a of Eciperay's config).
- *
- * Metro, Babel, and Jest config files use CommonJS (`require` /
- * `module.exports`). Section 1b re-enables `no-undef` for .js/.cjs/.mjs;
- * Node globals cover `require`, `module`, and `process` here.
- *
- * This is a separate export because it must come AFTER the `importX` and
- * `unicorn` exports in the composed config array:
- * `[...base, ...importX, ...unicorn, ...commonjsOverrides, ...]`.
+ * The shared base, composed in the order Stephen's export surface
+ * promises: core, import-x, unicorn, CommonJS overrides (after
+ * import-x/unicorn), eslint-comments, coverage-ignore, and Prettier
+ * last.
  */
-export const commonjsOverrides: Linter.Config[] = [
-  {
-    files: ['**/*.cjs'],
-    languageOptions: {globals: globals.node},
-    rules: {'import-x/no-commonjs': 'off', 'unicorn/prefer-module': 'off'},
-  },
+export const base: Linter.Config[] = [
+  ...baseCore,
+  ...importX,
+  ...unicorn,
+  ...commonjsOverrides,
+  ...eslintComments,
+  ...coverageIgnore,
+  // --- 13. Prettier -- last, disables formatting conflicts ---
+  prettier,
 ];
 
 export default base;

@@ -6,10 +6,17 @@ import type {Linter} from 'eslint';
  *
  * Ported from section 7 of Eciperay's eslint.config.ts, plus the jest
  * entries from section 12 (rules added by the Oct 2026 plugin bump,
- * disabled pending individual evaluation). The `files` globs are the
- * generic equivalents of Eciperay's (test/spec suffixes, jest setup/env
- * files, __tests__ fixtures, and src/test helpers at any depth).
- * Every rule is explicitly configured with its rationale inline.
+ * disabled pending individual evaluation).
+ *
+ * Scoping: the `files` globs below use only Jest-ecosystem naming
+ * conventions — test/spec suffixes, `jest.setup`/`jest.env`/
+ * `jest.setupEnv` filenames, and `__tests__/` (part of Jest's default
+ * testMatch). This package carries no repo-layout globs (Stephen,
+ * 2026-10-24), so Eciperay's `src/test/` helper directory is NOT
+ * covered here: repos whose test helpers live in a named directory
+ * attach their own block with the same rules (or reuse this export's
+ * blocks with their paths mapped on). Every rule is explicitly
+ * configured with its rationale inline.
  */
 export const jest: Linter.Config[] = [
   {
@@ -20,7 +27,6 @@ export const jest: Linter.Config[] = [
       '**/jest.env.{ts,js}',
       '**/jest.setupEnv.{ts,js}',
       '**/__tests__/**/*.{ts,tsx,js,jsx}', // shared fixtures
-      '**/src/test/**/*.{ts,js}', // server test helpers and fixtures
     ],
     plugins: {jest: jestPlugin},
     languageOptions: {

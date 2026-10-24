@@ -11,13 +11,34 @@ function messages(code, config, filename) {
   return linter.verify(code, config, {filename});
 }
 
-test('node: n/no-process-exit fires in a server file', () => {
-  const msgs = messages('process.exit(1);\n', [...node], 'server/index.js');
+test('node: the export carries no files globs (paths are consumer-side)', () => {
+  for (const block of node) {
+    assert.ok(!('files' in block), 'node blocks must not bake in paths');
+  }
+});
+
+// The documented consumer pattern: the repo attaches its own server
+// directories to the rules-only node blocks.
+const nodeForEciperay = node.map(block => ({
+  ...block,
+  files: ['packages/server/**', 'packages/mcp-server/**'],
+}));
+
+test('node: n/no-process-exit fires in a server file (consumer-mapped)', () => {
+  const msgs = messages(
+    'process.exit(1);\n',
+    [...nodeForEciperay],
+    'packages/server/index.js',
+  );
   assert.ok(msgs.some(m => m.ruleId === 'n/no-process-exit'));
 });
 
-test('node: server rules do not apply outside server directories', () => {
-  const msgs = messages('process.exit(1);\n', [...node], 'client/index.js');
+test('node: server rules do not apply outside the consumer paths', () => {
+  const msgs = messages(
+    'process.exit(1);\n',
+    [...nodeForEciperay],
+    'packages/app/index.js',
+  );
   assert.ok(!msgs.some(m => m.ruleId === 'n/no-process-exit'));
 });
 

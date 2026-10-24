@@ -2,18 +2,28 @@ import nPlugin from 'eslint-plugin-n';
 import type {Linter} from 'eslint';
 
 /**
- * Node.js rules (eslint-plugin-n) for server code.
+ * Node.js rules (eslint-plugin-n) for server code — RULES ONLY.
  *
  * Ported from section 6 of Eciperay's eslint.config.ts, plus the n
  * entries from section 12 (rules added by the Oct 2026 plugin bump,
- * disabled pending individual evaluation). The default `files` glob
- * matches `server/` and `mcp-server/` directories at any depth (in
- * Eciperay: packages/server, packages/mcp-server). Consumers with a
- * different server layout can remap `files` on the returned blocks.
+ * disabled pending individual evaluation).
+ *
+ * This export deliberately carries NO `files:` globs (Stephen,
+ * 2026-10-24: the shared config must not bake in any repo's directory
+ * layout). Spreading it bare would apply the server rules everywhere —
+ * including the core-rule overrides in the first block (max-lines 220,
+ * classes allowed for Error subclasses) — so always attach your own
+ * paths. In Eciperay:
+ *
+ * ```ts
+ * ...node.map(block => ({
+ *   ...block,
+ *   files: ['packages/server/**', 'packages/mcp-server/**'],
+ * })),
+ * ```
  */
 export const node: Linter.Config[] = [
   {
-    files: ['**/{server,mcp-server}/**/*.{ts,js,mjs}'],
     plugins: {n: nPlugin},
     rules: {
       'max-lines': [
@@ -78,7 +88,6 @@ export const node: Linter.Config[] = [
   // Disabled pending individual evaluation, which preserves prior lint
   // behavior exactly (none of them were applied before).
   {
-    files: ['**/{server,mcp-server}/**/*.{ts,js,mjs}'],
     plugins: {n: nPlugin},
     rules: {
       // eslint-plugin-n additions

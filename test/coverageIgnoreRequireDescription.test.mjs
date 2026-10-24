@@ -4,7 +4,7 @@ import {test} from 'node:test';
 import {Linter} from 'eslint';
 
 import coverageIgnorePlugin from '../dist/coverage-ignore-plugin.js';
-import {coverageIgnore} from '../dist/index.js';
+import {base} from '../dist/index.js';
 
 // Ported from Eciperay's eslint-rules/coverage-ignore-require-description
 // .test.ts, adapted to this package's node:test harness: the rule is
@@ -57,16 +57,15 @@ test('coverage-ignore (ported): skips comments without a source location', () =>
   assert.deepEqual(runRuleOnComments([{value: ' istanbul ignore next '}]), []);
 });
 
-// Linter-API tests through the shared `coverageIgnore` config export.
+// Linter-API tests through `base`, which the coverage-ignore section
+// folded into (Stephen, 2026-10-24 — no longer a standalone export).
 const linter = new Linter();
 
 function ruleIds(code, filename = 'x.js') {
-  return linter
-    .verify(code, [...coverageIgnore], {filename})
-    .map(m => m.ruleId);
+  return linter.verify(code, [...base], {filename}).map(m => m.ruleId);
 }
 
-test('coverageIgnore export: istanbul ignore without a reason fires', () => {
+test('coverageIgnore (in base): istanbul ignore without a reason fires', () => {
   const ids = ruleIds(
     '/* istanbul ignore next */\nconst x = 1;\nexport default x;\n',
   );
@@ -76,12 +75,12 @@ test('coverageIgnore export: istanbul ignore without a reason fires', () => {
   );
 });
 
-test('coverageIgnore export: c8 ignore line comment without a reason fires', () => {
+test('coverageIgnore (in base): c8 ignore line comment without a reason fires', () => {
   const ids = ruleIds('// c8 ignore next\nconst x = 1;\nexport default x;\n');
   assert.ok(ids.includes('coverage-ignore/require-description'));
 });
 
-test('coverageIgnore export: ignore comments with a `-- reason` pass', () => {
+test('coverageIgnore (in base): ignore comments with a `-- reason` pass', () => {
   const ids = ruleIds(
     '/* istanbul ignore next -- branch is defensive */\nconst x = 1;\nexport default x;\n',
   );

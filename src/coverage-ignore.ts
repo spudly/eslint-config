@@ -11,7 +11,8 @@ import coverageIgnorePlugin from './coverage-ignore-plugin.js';
  *
  * Ported from Eciperay's local custom rule at Stephen's direction
  * (2026-10-24). Applies globally with no `files` glob, exactly as in
- * Eciperay.
+ * Eciperay. Folded into the `base` export (Stephen, 2026-10-24) — not
+ * a standalone export.
  */
 export const coverageIgnore: Linter.Config[] = [
   {
