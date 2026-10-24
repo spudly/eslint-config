@@ -2,7 +2,7 @@
 
 ## Rule Description
 
-Requires long class lists to wrap one class per line past the configured line width, so wide class lists stay readable.
+Requires class lists that exceed the print width to wrap across lines instead of running on, so wide class lists stay readable. The export passes the rule no options, so the plugin's default print width of 80 characters is the budget a class list must fit.
 
 ## Configuration
 
@@ -19,6 +19,27 @@ Requires long class lists to wrap one class per line past the configured line wi
 - Export: tailwind
 - File: fixture.tsx
 
-## Not snippet-testable
+## Bad
 
-The rule wraps long class lists across lines against a maximum line length. The tailwind export passes it no options and gives it no line-width budget, and every class list these snippets can reasonably contain fits on one line — there is no honest way to construct a Bad case that trips a limit the shipped config does not set. If the export ever configures a width, this file should gain Bad/Good snippets.
+<!-- prettier-ignore -->
+```js
+export function Box() {
+  return (
+    <div className="flex items-center justify-between gap-4 rounded-lg border border-gray-300 bg-white px-4 py-2 shadow-md" />
+  );
+}
+```
+
+## Good
+
+<!-- prettier-ignore -->
+```js
+export function Box() {
+  return (
+    <div className="
+      flex items-center justify-between gap-4 rounded-lg border border-gray-300
+      bg-white px-4 py-2 shadow-md
+    " />
+  );
+}
+```
