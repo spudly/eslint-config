@@ -69,19 +69,22 @@ repo attaches its own paths by mapping `files` onto the returned
 blocks, as in the example above.
 
 Every export is also available as a subpath import with a default
-export, e.g. `import base from '@spudly/eslint-config/base'`.
+export, e.g. `import base from '@spudly/eslint-config/base'`. One
+export exists ONLY as a subpath — `reactPending` (see its section
+below).
 
 ## Exports
 
-| Export                     | Subpath                              | Contents                                                                                                                                                                                                                                                                                                                                                                                                          | Source in Eciperay's config                             |
-| -------------------------- | ------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
-| `base`                     | `@spudly/eslint-config/base`         | Everything every repo shares: all 292 core ESLint rules explicitly configured; JS-file re-enables for rules superseded by @typescript-eslint; eslint-plugin-import-x and eslint-plugin-unicorn, every rule explicit; the `.cjs` CommonJS overrides; eslint-comments discipline (a reason is required on every inline disable); the `coverage-ignore/require-description` custom rule; eslint-config-prettier last | Sections 1, 1b, 3, 4, 4a, 10, 11, 12 (unicorn part), 13 |
-| `react`                    | `@spudly/eslint-config/react`        | React rules on `@eslint-react/eslint-plugin` (see migration notes below) + eslint-plugin-react-hooks, every rule explicit                                                                                                                                                                                                                                                                                         | Sections 5 (react part), 8c, 12 (react-hooks part)      |
-| `reactNative`              | `@spudly/eslint-config/react-native` | The 7 react-native rules, **vendored** (see below): 5 on, 2 off, matching Eciperay severities                                                                                                                                                                                                                                                                                                                     | Section 5 (react-native part)                           |
-| `node`                     | `@spudly/eslint-config/node`         | eslint-plugin-n for server code, every rule explicit, plus the Oct 2026 additions held `off`. **Rules only — no `files:` globs**; the consuming repo attaches its own server paths (see Usage)                                                                                                                                                                                                                    | Sections 6, 12 (n part)                                 |
-| `jest`                     | `@spudly/eslint-config/jest`         | eslint-plugin-jest for test/setup files (with the core/unicorn relaxations Eciperay applies in test scope), every rule explicit, plus the Oct 2026 additions held `off`. Scoped by Jest naming conventions only (test/spec suffixes, `jest.setup*` filenames, `__tests__/`)                                                                                                                                       | Sections 7, 12 (jest part)                              |
-| `tailwind`                 | `@spudly/eslint-config/tailwind`     | eslint-plugin-better-tailwindcss (pinned 4.5.0, the version the source config was tuned against)                                                                                                                                                                                                                                                                                                                  | Sections 8, 8a                                          |
-| `typescriptPendingIgnores` | `@spudly/eslint-config/typescript`   | Global ignores for `*.ts`/`*.tsx`/`*.mts`/`*.cts` — the interim state while typescript-eslint lacks TS7 support (see below)                                                                                                                                                                                                                                                                                       | Top-of-file ignores block                               |
+| Export                     | Subpath                               | Contents                                                                                                                                                                                                                                                                                                                                                                                                          | Source in Eciperay's config                             |
+| -------------------------- | ------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
+| `base`                     | `@spudly/eslint-config/base`          | Everything every repo shares: all 292 core ESLint rules explicitly configured; JS-file re-enables for rules superseded by @typescript-eslint; eslint-plugin-import-x and eslint-plugin-unicorn, every rule explicit; the `.cjs` CommonJS overrides; eslint-comments discipline (a reason is required on every inline disable); the `coverage-ignore/require-description` custom rule; eslint-config-prettier last | Sections 1, 1b, 3, 4, 4a, 10, 11, 12 (unicorn part), 13 |
+| `react`                    | `@spudly/eslint-config/react`         | eslint-plugin-react-hooks, every rule explicit: the classic rules at `error`, the react-hooks 7 additions held `off`. The `@eslint-react` rules moved to `reactPending` pending TS7 support (see below)                                                                                                                                                                                                           | Sections 5 (react part), 8c, 12 (react-hooks part)      |
+| `reactPending`             | `@spudly/eslint-config/react-pending` | The full `@eslint-react` rule set, every rule explicit, preserved verbatim — **pending, composed nowhere yet**: @eslint-react's plugin chain crashes on load under TypeScript 7 (issue #8). **Subpath-only**, deliberately not exported from the package root, so root imports stay TS7-safe (see below)                                                                                                          | Sections 5 (react part), 8c                             |
+| `reactNative`              | `@spudly/eslint-config/react-native`  | The 7 react-native rules, **vendored** (see below): 5 on, 2 off, matching Eciperay severities                                                                                                                                                                                                                                                                                                                     | Section 5 (react-native part)                           |
+| `node`                     | `@spudly/eslint-config/node`          | eslint-plugin-n for server code, every rule explicit, plus the Oct 2026 additions held `off`. **Rules only — no `files:` globs**; the consuming repo attaches its own server paths (see Usage)                                                                                                                                                                                                                    | Sections 6, 12 (n part)                                 |
+| `jest`                     | `@spudly/eslint-config/jest`          | eslint-plugin-jest for test/setup files (with the core/unicorn relaxations Eciperay applies in test scope), every rule explicit, plus the Oct 2026 additions held `off`. Scoped by Jest naming conventions only (test/spec suffixes, `jest.setup*` filenames, `__tests__/`)                                                                                                                                       | Sections 7, 12 (jest part)                              |
+| `tailwind`                 | `@spudly/eslint-config/tailwind`      | eslint-plugin-better-tailwindcss (pinned 4.5.0, the version the source config was tuned against)                                                                                                                                                                                                                                                                                                                  | Sections 8, 8a                                          |
+| `typescriptPendingIgnores` | `@spudly/eslint-config/typescript`    | Global ignores for `*.ts`/`*.tsx`/`*.mts`/`*.cts` — the interim state while typescript-eslint lacks TS7 support (see below)                                                                                                                                                                                                                                                                                       | Top-of-file ignores block                               |
 
 ### Which repos use which subsets (planned adoption)
 
@@ -115,7 +118,7 @@ e.g. `react/jsx-key` -> `@eslint-react/no-missing-key`,
   equivalent), and `react/no-deprecated` -> its split equivalents
   (`no-component-will-*`, `dom-no-render`, `dom-no-hydrate`, ...).
 
-Dropped, with the reason recorded in `src/react.ts`:
+Dropped, with the reason recorded in `src/react-pending.ts`:
 
 - `react/jsx-no-undef`, `react/jsx-uses-vars`, `react/jsx-uses-react` —
   ESLint 10 tracks JSX references natively; the rules are unnecessary.
@@ -202,6 +205,42 @@ rules in `base` section 1 that are noted as "superseded by
 @typescript-eslint" stay as they are — they were configured for that
 return.
 
+## React: the @eslint-react interim state and the restore path
+
+The `@eslint-react` rules get the same treatment as typescript-eslint
+above (Stephen's decision, 2026-10-24). @eslint-react's plugin chain
+cannot load under TypeScript 7 today:
+`eslint-plugin-react-x` imports `ts-api-utils` at module top level,
+and `ts-api-utils` reads `ts.TypeFlags` during initialization —
+TypeScript 7's JS API exposes no `TypeFlags`, so the import throws
+for every consumer on TS7 (all three repos). That is
+[issue #8](https://github.com/spudly/eslint-config/issues/8); in
+0.1.0 it made the whole `react` export — and the package root —
+crash on load for TS7 consumers.
+
+Until a compatible upstream release lands, the full @eslint-react
+configuration is preserved verbatim (severities and rationale
+comments intact) in the `reactPending` export, which ships
+**subpath-only** (`@spudly/eslint-config/react-pending`) and is
+deliberately not re-exported from the package root, so root imports
+stay loadable under TS7. No consumer composes it yet. The `react`
+export still ships the eslint-plugin-react-hooks rules; consumers
+composing `react` lose the @eslint-react rules until restoration.
+The `check-rules` audit covers the pending export exactly like a
+composed one, so its rules stay current while they wait.
+
+Restore condition: an `@eslint-react` / `eslint-plugin-react-x`
+release whose `ts-api-utils` chain initializes under TypeScript 7.x.
+It is proven by the TypeScript 7 consumer fixture
+(`test/ts7Consumer.test.mjs`), which installs the packed package
+next to `typescript@^7` and asserts the composed exports load and
+lint there — and whose pending tripwire goes red the day
+`reactPending` itself loads. Restoration is then a composition
+change: the pending block folds back into `react`, the subpath is
+deleted, and the full React rule set returns in every consumer with
+one package release. Restoration is tracked on issue #8 alongside
+the typescript-eslint watch.
+
 ## Known local-only pieces (not in this package)
 
 These stay in Eciperay when it adopts the shared config:
@@ -262,7 +301,9 @@ own metadata (the composed config's registered plugins +
 latest release (5.0.0) caps its peer range at ESLint ^9 and cannot run
 under ESLint 10; the script's header documents the scope decisions
 (the upstream-owned eslint-config-prettier block, @eslint-react's
-`x-` alias names, and plugin rules whose plugin is not installed).
+`x-` alias names, plugin rules whose plugin is not installed, and
+the pending `reactPending` export, which is audited like a composed
+export so its rules cannot rot while they wait for TS7 support).
 
 **Weekly process:** An AI agent runs `check-rules` once a week and raises a
 normal PR for any findings — removals for deprecated/removed rules,

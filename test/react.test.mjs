@@ -4,6 +4,14 @@ import {test} from 'node:test';
 import {Linter} from 'eslint';
 
 import {react, reactNative, tailwind} from '../dist/index.js';
+import reactPending from '../dist/react-pending.js';
+
+// The @eslint-react rules live in the pending export until upstream
+// is TypeScript 7-compatible (issue #8); these tests exercise the
+// restored composition (react + reactPending) that consumers get back
+// at restore time, so the verbatim preservation is proven by behavior,
+// not just by inspection.
+const reactRestored = [...react, ...reactPending];
 
 const linter = new Linter();
 const jsxLang = {
@@ -23,7 +31,7 @@ test('react: @eslint-react/no-missing-key fires without a key', () => {
   const code = `export const List = ({items}) => (
     <ul>{items.map(item => <li>{item.name}</li>)}</ul>
   );\n`;
-  const ids = ruleIds(code, [...react]);
+  const ids = ruleIds(code, reactRestored);
   assert.ok(
     ids.includes('@eslint-react/no-missing-key'),
     `got: ${ids.join(', ')}`,
@@ -34,13 +42,13 @@ test('react: no-missing-key passes when keys are present', () => {
   const code = `export const List = ({items}) => (
     <ul>{items.map(item => <li key={item.id}>{item.name}</li>)}</ul>
   );\n`;
-  const ids = ruleIds(code, [...react]);
+  const ids = ruleIds(code, reactRestored);
   assert.ok(!ids.includes('@eslint-react/no-missing-key'));
 });
 
 test('react: jsx-no-comment-textnodes fires on comment-like JSX text', () => {
   const code = 'export const C = () => <div>/* not a comment */</div>;\n';
-  const ids = ruleIds(code, [...react]);
+  const ids = ruleIds(code, reactRestored);
   assert.ok(
     ids.includes('@eslint-react/jsx-no-comment-textnodes'),
     `got: ${ids.join(', ')}`,

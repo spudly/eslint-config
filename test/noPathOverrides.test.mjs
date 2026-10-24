@@ -10,6 +10,7 @@ import {
   tailwind,
   typescriptPendingIgnores,
 } from '../dist/index.js';
+import reactPending from '../dist/react-pending.js';
 
 // Stephen (2026-10-24): the shared config must not bake in any repo's
 // directory layout. Extension/language scoping is intrinsic to the
@@ -36,12 +37,17 @@ function layoutSegments(pattern) {
   return bad;
 }
 
+// reactPending is audited by the glob guard like every other export,
+// but it is intentionally absent from the root surface asserted
+// below: it ships subpath-only so the root stays loadable under
+// TypeScript 7 (issue #8), and folds back into `react` at restore.
 const allExports = {
   base,
   jest,
   node,
   react,
   reactNative,
+  reactPending,
   tailwind,
   typescriptPendingIgnores,
 };

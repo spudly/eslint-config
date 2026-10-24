@@ -45,6 +45,10 @@
       "default": "./dist/react.js",
       "types": "./dist/react.d.ts"
     },
+    "./react-pending": {
+      "default": "./dist/react-pending.js",
+      "types": "./dist/react-pending.d.ts"
+    },
     "./react-native": {
       "default": "./dist/react-native.js",
       "types": "./dist/react-native.d.ts"
