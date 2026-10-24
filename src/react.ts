@@ -27,8 +27,17 @@ const reactHooks = reactHooksPlugin as unknown as ESLint.Plugin;
  * eslint.config.ts: the two classic hooks rules as 'error' (the app
  * section's severity; the web section 8c used 'warn' for
  * exhaustive-deps — consumers can override per file set, as before),
- * plus the react-hooks 7 (React Compiler) rule set held 'off' pending
- * individual evaluation, which preserves prior lint behavior exactly.
+ * plus the react-hooks 7 (React Compiler) rule set held 'off',
+ * which preserves prior lint behavior exactly. The Compiler
+ * diagnostics that also exist in @eslint-react were evaluated in
+ * issue #4 (2026-10-24): the @eslint-react versions in
+ * src/react-pending.ts are the chosen single source for them, so
+ * their react-hooks duplicates below (static-components, use-memo,
+ * immutability, globals, refs, set-state-in-effect, error-boundaries,
+ * purity, set-state-in-render, unsupported-syntax) stay 'off' by
+ * decision, not undecided — enabling both namespaces would
+ * double-report the same patterns. The remaining react-hooks 7
+ * additions are still 'off', awaiting individual evaluation.
  */
 export const react: Linter.Config[] = [
   {

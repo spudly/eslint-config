@@ -52,8 +52,28 @@ import type {Linter} from 'eslint';
  * listed below with a rationale comment — no preset is extended.
  * Rules that were 'error' under eslint-plugin-react stay 'error'
  * wherever an equivalent exists. @eslint-react rules with no
- * eslint-plugin-react counterpart are 'off' pending individual
- * evaluation (the same policy as section 12 of the source config).
+ * eslint-plugin-react counterpart were held 'off' pending individual
+ * evaluation (the same policy as section 12 of the source config);
+ * that evaluation is COMPLETE (issue #4, 2026-10-24): each such rule
+ * was trialled as 'error' against the design system's src/ tree:
+ * 39 are now 'error' below with their finding counts recorded, and
+ * the three type-requiring rules (no-implicit-children,
+ * no-implicit-key, no-implicit-ref) stay 'off' with the
+ * typed-linting rationale recorded on their entries, alongside the
+ * two hooks rules and the two rules with substantive 'off' reasons
+ * (no-class-component, rsc-function-definition). No undecided
+ * entries remain.
+ *
+ * Hooks-source decision (issue #4): eslint-plugin-react-hooks stays
+ * the source for the two classic hooks rules (rules-of-hooks,
+ * exhaustive-deps), so @eslint-react's versions stay 'off' below.
+ * For the React Compiler diagnostics that exist under both
+ * namespaces (purity, immutability, refs, globals,
+ * static-components, set-state-in-effect, set-state-in-render,
+ * error-boundaries, unsupported-syntax, use-memo), the @eslint-react
+ * versions enabled below are the single source when this export is
+ * restored; the react-hooks duplicates in src/react.ts stay 'off'
+ * (recorded there) so nothing double-reports.
  *
  * Dropped eslint-plugin-react rules (no @eslint-react equivalent):
  * - react/jsx-filename-extension (was error) — upstream offers this
@@ -141,53 +161,55 @@ export const reactPending: Linter.Config[] = [
       '@eslint-react/dom-no-void-elements-with-children': 'off', // react/void-dom-elements-no-children — React Native has no void DOM elements
 
       // ── @eslint-react — no eslint-plugin-react counterpart ───────────────
-      // Off pending individual evaluation (section 12 policy).
-      '@eslint-react/error-boundaries': 'off', // no counterpart; pending evaluation
+      // Evaluated individually in issue #4 (trialled as 'error' against
+      // the design system's src/ tree, 2026-10-24): 'error' unless a
+      // substantive 'off' rationale is recorded on the entry.
+      '@eslint-react/error-boundaries': 'error', // evaluated in #4: validates Error Boundary usage instead of try/catch for child errors; 0 findings in the DS trial
       '@eslint-react/exhaustive-deps': 'off', // hooks rules come from eslint-plugin-react-hooks below, not @eslint-react
       '@eslint-react/rules-of-hooks': 'off', // hooks rules come from eslint-plugin-react-hooks below, not @eslint-react
-      '@eslint-react/globals': 'off', // no counterpart; pending evaluation
-      '@eslint-react/immutability': 'off', // no counterpart; pending evaluation
-      '@eslint-react/no-children-count': 'off', // no counterpart; pending evaluation
-      '@eslint-react/no-children-for-each': 'off', // no counterpart; pending evaluation
-      '@eslint-react/no-children-map': 'off', // no counterpart; pending evaluation
-      '@eslint-react/no-children-only': 'off', // no counterpart; pending evaluation
-      '@eslint-react/no-children-to-array': 'off', // no counterpart; pending evaluation
+      '@eslint-react/globals': 'error', // evaluated in #4: no assignment/mutation of globals during render; 0 findings in the DS trial
+      '@eslint-react/immutability': 'error', // evaluated in #4: no mutating props/state/immutable values during render; the DS trial's only findings (4) are one site — MemorizationSessionPage's blankOrdinal counter, tracked for refactor in design-system#135 before this export is restored (#8)
+      '@eslint-react/no-children-count': 'error', // evaluated in #4: Children.* APIs are opaque and error-prone; use the children value directly; 0 findings in the DS trial
+      '@eslint-react/no-children-for-each': 'error', // evaluated in #4: Children.* APIs are opaque and error-prone; use the children value directly; 0 findings in the DS trial
+      '@eslint-react/no-children-map': 'error', // evaluated in #4: Children.* APIs are opaque and error-prone; use the children value directly; 0 findings in the DS trial
+      '@eslint-react/no-children-only': 'error', // evaluated in #4: Children.* APIs are opaque and error-prone; use the children value directly; 0 findings in the DS trial
+      '@eslint-react/no-children-to-array': 'error', // evaluated in #4: Children.* APIs are opaque and error-prone; use the children value directly; 0 findings in the DS trial
       '@eslint-react/no-class-component': 'off', // no counterpart; classes are already banned by base's no-restricted-syntax
-      '@eslint-react/no-clone-element': 'off', // no counterpart; pending evaluation
-      '@eslint-react/no-context-provider': 'off', // no counterpart; pending evaluation
-      '@eslint-react/no-create-ref': 'off', // no counterpart as its own rule (part of the no-deprecated family upstream); pending evaluation
-      '@eslint-react/no-duplicate-key': 'off', // part of the jsx-key family upstream, but eslint-plugin-react's jsx-key did not check duplicate keys; pending evaluation
-      '@eslint-react/no-implicit-children': 'off', // no counterpart; pending evaluation
-      '@eslint-react/no-implicit-key': 'off', // part of the jsx-key family upstream, but not checked by eslint-plugin-react's jsx-key; pending evaluation
-      '@eslint-react/no-implicit-ref': 'off', // no counterpart; pending evaluation
-      '@eslint-react/no-misused-capture-owner-stack': 'off', // no counterpart; pending evaluation
-      '@eslint-react/no-nested-lazy-component-declarations': 'off', // no counterpart; pending evaluation
-      '@eslint-react/no-unnecessary-use-prefix': 'off', // no counterpart; pending evaluation
-      '@eslint-react/no-use-context': 'off', // no counterpart; React 19 `use` migration style rule; pending evaluation
-      '@eslint-react/purity': 'off', // no counterpart; pending evaluation
-      '@eslint-react/refs': 'off', // no counterpart; pending evaluation
+      '@eslint-react/no-clone-element': 'error', // evaluated in #4: cloneElement hides data flow; pass props explicitly instead; 0 findings in the DS trial
+      '@eslint-react/no-context-provider': 'error', // evaluated in #4: React 19 renders a context object directly instead of <Context.Provider>; 0 findings in the DS trial
+      '@eslint-react/no-create-ref': 'error', // evaluated in #4: createRef is the class-component API; function components use useRef; 0 findings in the DS trial
+      '@eslint-react/no-duplicate-key': 'error', // evaluated in #4 (jsx-key family): duplicate keys on siblings break reconciliation; eslint-plugin-react's jsx-key never checked this; 0 findings in the DS trial
+      '@eslint-react/no-implicit-children': 'off', // evaluated in #4: requires type information — enabling it crashes lint runs without typed parsing, and no consumer runs typed linting today (TS files are ignored pending the typescript-eslint restoration); typed DS trial found 0 findings, so revisit at restoration (#8) when typed linting exists
+      '@eslint-react/no-implicit-key': 'off', // evaluated in #4 (jsx-key family): requires type information — same typed-linting constraint as no-implicit-children; typed DS trial found 0 findings; revisit at restoration (#8)
+      '@eslint-react/no-implicit-ref': 'off', // evaluated in #4: requires type information — same typed-linting constraint as no-implicit-children; typed DS trial found 0 findings; revisit at restoration (#8)
+      '@eslint-react/no-misused-capture-owner-stack': 'error', // evaluated in #4: captureOwnerStack is dev-only and must follow React's usage contract; 0 findings in the DS trial
+      '@eslint-react/no-nested-lazy-component-declarations': 'error', // evaluated in #4: lazy() wrappers declared in render are recreated every render; hoist them; 0 findings in the DS trial
+      '@eslint-react/no-unnecessary-use-prefix': 'error', // evaluated in #4: a use-prefixed function must actually call a hook; 0 findings in the DS trial
+      '@eslint-react/no-use-context': 'error', // evaluated in #4: React 19's use() replaces useContext; 0 findings in the DS trial
+      '@eslint-react/purity': 'error', // evaluated in #4: components/hooks must not call impure functions or construct impure values during render; 0 findings in the DS trial
+      '@eslint-react/refs': 'error', // evaluated in #4: ref.current must not be read or written during render; 0 findings in the DS trial
       '@eslint-react/rsc-function-definition': 'off', // no counterpart; no React Server Components in these apps
-      '@eslint-react/set-state-in-effect': 'off', // no counterpart; pending evaluation
-      '@eslint-react/set-state-in-render': 'off', // no counterpart; pending evaluation
-      '@eslint-react/static-components': 'off', // no counterpart; pending evaluation
-      '@eslint-react/unsupported-syntax': 'off', // no counterpart; pending evaluation
-      '@eslint-react/use-memo': 'off', // no counterpart; pending evaluation
-      '@eslint-react/jsx-no-children-prop-with-children': 'off', // no counterpart; pending evaluation
-      '@eslint-react/jsx-no-key-after-spread': 'off', // no counterpart; pending evaluation
-      '@eslint-react/jsx-no-leaked-dollar': 'off', // no counterpart; pending evaluation
-      '@eslint-react/jsx-no-leaked-semicolon': 'off', // no counterpart; pending evaluation
-      '@eslint-react/dom-no-flush-sync': 'off', // no counterpart; pending evaluation
-      '@eslint-react/dom-no-unsafe-iframe-sandbox': 'off', // no counterpart; pending evaluation
-      '@eslint-react/dom-no-use-form-state': 'off', // no counterpart; pending evaluation
-      '@eslint-react/web-api-no-leaked-event-listener': 'off', // no counterpart; pending evaluation
-      '@eslint-react/web-api-no-leaked-fetch': 'off', // no counterpart; pending evaluation
-      '@eslint-react/web-api-no-leaked-intersection-observer': 'off', // no counterpart; pending evaluation
-      '@eslint-react/web-api-no-leaked-interval': 'off', // no counterpart; pending evaluation
-      '@eslint-react/web-api-no-leaked-resize-observer': 'off', // no counterpart; pending evaluation
-      '@eslint-react/web-api-no-leaked-timeout': 'off', // no counterpart; pending evaluation
-      '@eslint-react/naming-convention-context-name': 'off', // no counterpart; pending evaluation
-      '@eslint-react/naming-convention-id-name': 'off', // no counterpart; pending evaluation
-      '@eslint-react/naming-convention-ref-name': 'off', // no counterpart; pending evaluation
+      '@eslint-react/set-state-in-effect': 'error', // evaluated in #4: no synchronous setState in an effect (extra renders); derive or subscribe instead; 0 findings in the DS trial
+      '@eslint-react/set-state-in-render': 'error', // evaluated in #4: no unconditional setState during render (render loops); 0 findings in the DS trial
+      '@eslint-react/static-components': 'error', // evaluated in #4: components must not be recreated every render; 0 findings in the DS trial
+      '@eslint-react/unsupported-syntax': 'error', // evaluated in #4: no syntax React Compiler does not support; 0 findings in the DS trial
+      '@eslint-react/use-memo': 'error', // evaluated in #4: useMemo results must be used and callbacks must be pure, parameterless value producers; 0 findings in the DS trial
+      '@eslint-react/jsx-no-children-prop-with-children': 'error', // evaluated in #4: passing children both as a prop and as nested content is contradictory; 0 findings in the DS trial
+      '@eslint-react/jsx-no-key-after-spread': 'error', // evaluated in #4: key after a spread deoptimizes the automatic JSX runtime; 0 findings in the DS trial
+      '@eslint-react/jsx-no-leaked-dollar': 'error', // evaluated in #4: a leaked $ from a pasted template literal renders literally in JSX text; 0 findings in the DS trial
+      '@eslint-react/jsx-no-leaked-semicolon': 'error', // evaluated in #4: a stray ; in JSX text renders literally; 0 findings in the DS trial
+      '@eslint-react/dom-no-flush-sync': 'error', // evaluated in #4: flushSync forces synchronous layout outside React's scheduling; 0 findings in the DS trial
+      '@eslint-react/dom-no-unsafe-iframe-sandbox': 'error', // evaluated in #4: iframe sandbox must not combine allow-scripts with allow-same-origin; 0 findings in the DS trial
+      '@eslint-react/dom-no-use-form-state': 'error', // evaluated in #4: useFormState is superseded by React 19's useActionState; 0 findings in the DS trial
+      '@eslint-react/web-api-no-leaked-event-listener': 'error', // evaluated in #4: every addEventListener needs its removeEventListener cleanup; 0 findings in the DS trial
+      '@eslint-react/web-api-no-leaked-fetch': 'error', // evaluated in #4: every fetch in a component/hook needs an AbortController cleanup; 0 findings in the DS trial
+      '@eslint-react/web-api-no-leaked-intersection-observer': 'error', // evaluated in #4: every IntersectionObserver needs its disconnect() cleanup; 0 findings in the DS trial
+      '@eslint-react/web-api-no-leaked-interval': 'error', // evaluated in #4: every setInterval needs its clearInterval cleanup; 0 findings in the DS trial
+      '@eslint-react/web-api-no-leaked-resize-observer': 'error', // evaluated in #4: every ResizeObserver needs its disconnect() cleanup; 0 findings in the DS trial
+      '@eslint-react/web-api-no-leaked-timeout': 'error', // evaluated in #4: every setTimeout needs its clearTimeout cleanup; 0 findings in the DS trial
+      '@eslint-react/naming-convention-context-name': 'error', // evaluated in #4: createContext results are named <Name>Context; 0 findings in the DS trial
+      '@eslint-react/naming-convention-id-name': 'error', // evaluated in #4: useId results are named id or *Id; 0 findings in the DS trial
+      '@eslint-react/naming-convention-ref-name': 'error', // evaluated in #4: useRef results are named ref or *Ref; 0 findings in the DS trial
     },
   },
 ];
