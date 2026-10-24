@@ -49,7 +49,6 @@ export const node: Linter.Config[] = [
       'n/no-exports-assign': 'error',
       'n/no-extraneous-import': 'off', // npm workspace symlinks cause false positives for @eciperay/* packages
       'n/no-extraneous-require': 'off', // we don't use require
-      'n/no-hide-core-modules': 'off', // deprecated rule
       'n/no-missing-import': 'off', // TypeScript and NodeNext resolution handle this
       'n/no-missing-require': 'off', // we don't use require
       'n/no-mixed-requires': 'off', // we don't use require
@@ -80,7 +79,6 @@ export const node: Linter.Config[] = [
       'n/prefer-promises/dns': 'off', // no DNS lookups in this project
       'n/prefer-promises/fs': 'error',
       'n/process-exit-as-throw': 'error',
-      'n/shebang': 'off', // deprecated rule; replaced by n/hashbang
     },
   },
 

@@ -238,7 +238,37 @@ npm test            # build + node --test (Linter-API tests for every export)
 npm run typecheck
 npm run lint          # dogfood: base over this repo's JS
 npm run prettier:check
+npm run check-rules   # config-currency audit (see below)
 ```
+
+## Config currency: `check-rules`
+
+The config's value depends on staying complete and current as ESLint
+and its plugins evolve. `npm run check-rules` audits the built composed
+config and exits non-zero when it finds drift, in three categories:
+
+- **Deprecated** rules still configured — policy: they are _removed_
+  from the config; no dead entries are kept.
+- **Removed / unknown** rules still configured (the id no longer
+  exists in the installed ESLint core or plugin) — policy: removed.
+- **Missing** rules — available in the installed core or in a plugin
+  this package composes, but with no explicit entry anywhere in the
+  package — policy: every available rule gets an explicit entry, and
+  anything set to `'off'` carries a comment explaining why.
+
+The audit is implemented in `scripts/checkRules.mjs` on ESLint 10's
+own metadata (the composed config's registered plugins +
+`builtinRules`). eslint-find-rules was the original candidate, but its
+latest release (5.0.0) caps its peer range at ESLint ^9 and cannot run
+under ESLint 10; the script's header documents the scope decisions
+(the upstream-owned eslint-config-prettier block, @eslint-react's
+`x-` alias names, and plugin rules whose plugin is not installed).
+
+**Weekly process:** An AI agent runs `check-rules` once a week and raises a
+normal PR for any findings — removals for deprecated/removed rules,
+explicit entries (severity + reasoning stated per rule) for new rules.
+A clean week produces no PR and no noise. The changes always land as
+reviewed PRs, never as silent auto-edits.
 
 Releases use Changesets, like `@spudly/ui`: add a changeset with your
 PR (`npm run changeset`), and on merge to `main` the release workflow
