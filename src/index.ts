@@ -7,8 +7,10 @@
  * import {
  *   base,
  *   commonjsOverrides,
+ *   coverageIgnore,
  *   importX,
  *   jest,
+ *   noClassNameOutsideComponents,
  *   node,
  *   react,
  *   reactNative,
@@ -28,6 +30,8 @@
  *   ...node,
  *   ...jest,
  *   ...tailwind,
+ *   ...coverageIgnore,
+ *   ...noClassNameOutsideComponents,
  * ];
  * ```
  *
@@ -35,8 +39,10 @@
  * `import base from '@spudly/eslint-config/base'`.
  */
 export {base, commonjsOverrides} from './base.js';
+export {default as coverageIgnore} from './coverage-ignore.js';
 export {default as importX} from './import-x.js';
 export {default as jest} from './jest.js';
+export {default as noClassNameOutsideComponents} from './no-classname-outside-components.js';
 export {default as node} from './node.js';
 export {default as react} from './react.js';
 export {default as reactNative} from './react-native.js';

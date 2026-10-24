@@ -33,6 +33,10 @@
       "default": "./dist/base.js",
       "types": "./dist/base.d.ts"
     },
+    "./coverage-ignore": {
+      "default": "./dist/coverage-ignore.js",
+      "types": "./dist/coverage-ignore.d.ts"
+    },
     "./import-x": {
       "default": "./dist/import-x.js",
       "types": "./dist/import-x.d.ts"
@@ -44,6 +48,10 @@
     "./node": {
       "default": "./dist/node.js",
       "types": "./dist/node.d.ts"
+    },
+    "./no-classname-outside-components": {
+      "default": "./dist/no-classname-outside-components.js",
+      "types": "./dist/no-classname-outside-components.d.ts"
     },
     "./react": {
       "default": "./dist/react.js",

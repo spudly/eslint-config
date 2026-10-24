@@ -36,8 +36,10 @@ by `@eslint-react/eslint-plugin` v5).
 import {
   base,
   commonjsOverrides,
+  coverageIgnore,
   importX,
   jest,
+  noClassNameOutsideComponents,
   node,
   react,
   reactNative,
@@ -58,6 +60,8 @@ export default [
   ...node,
   ...jest,
   ...tailwind,
+  ...coverageIgnore,
+  ...noClassNameOutsideComponents,
 ];
 ```
 
@@ -75,29 +79,37 @@ export, e.g. `import base from '@spudly/eslint-config/base'`.
 
 ## Exports
 
-| Export                     | Subpath                              | Contents                                                                                                                                                                                                               | Source in Eciperay's config                        |
-| -------------------------- | ------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
-| `base`                     | `@spudly/eslint-config/base`         | All 292 core ESLint rules explicitly configured; JS-file re-enables for rules superseded by @typescript-eslint; eslint-comments discipline (a reason is required on every inline disable); eslint-config-prettier last | Sections 1, 1b, 11, 13                             |
-| `commonjsOverrides`        | (root only)                          | Node globals + `import-x/no-commonjs` / `unicorn/prefer-module` off for `.cjs` config files. Must be composed **after** `importX` and `unicorn`                                                                        | Section 4a                                         |
-| `importX`                  | `@spudly/eslint-config/import-x`     | eslint-plugin-import-x, every rule explicit; plus the web/client `no-cycle` relaxation generalized to `web/`/`client/` directories                                                                                     | Sections 3, 8b                                     |
-| `unicorn`                  | `@spudly/eslint-config/unicorn`      | eslint-plugin-unicorn, every rule explicit, plus the Oct 2026 additions held `off` pending evaluation                                                                                                                  | Sections 4, 12 (unicorn part)                      |
-| `react`                    | `@spudly/eslint-config/react`        | React rules on `@eslint-react/eslint-plugin` (see migration notes below) + eslint-plugin-react-hooks, every rule explicit                                                                                              | Sections 5 (react part), 8c, 12 (react-hooks part) |
-| `reactNative`              | `@spudly/eslint-config/react-native` | The 7 react-native rules, **vendored** (see below): 5 on, 2 off, matching Eciperay severities                                                                                                                          | Section 5 (react-native part)                      |
-| `node`                     | `@spudly/eslint-config/node`         | eslint-plugin-n for server code, every rule explicit, plus the Oct 2026 additions held `off`                                                                                                                           | Sections 6, 12 (n part)                            |
-| `jest`                     | `@spudly/eslint-config/jest`         | eslint-plugin-jest for test/setup files (with the core/unicorn relaxations Eciperay applies in test scope), every rule explicit, plus the Oct 2026 additions held `off`                                                | Sections 7, 12 (jest part)                         |
-| `tailwind`                 | `@spudly/eslint-config/tailwind`     | eslint-plugin-better-tailwindcss (pinned 4.5.0, the version the source config was tuned against)                                                                                                                       | Sections 8, 8a                                     |
-| `typescriptPendingIgnores` | `@spudly/eslint-config/typescript`   | Global ignores for `*.ts`/`*.tsx`/`*.mts`/`*.cts` — the interim state while typescript-eslint lacks TS7 support (see below)                                                                                            | Top-of-file ignores block                          |
+| Export                         | Subpath                                                 | Contents                                                                                                                                                                                                               | Source in Eciperay's config                        |
+| ------------------------------ | ------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
+| `base`                         | `@spudly/eslint-config/base`                            | All 292 core ESLint rules explicitly configured; JS-file re-enables for rules superseded by @typescript-eslint; eslint-comments discipline (a reason is required on every inline disable); eslint-config-prettier last | Sections 1, 1b, 11, 13                             |
+| `commonjsOverrides`            | (root only)                                             | Node globals + `import-x/no-commonjs` / `unicorn/prefer-module` off for `.cjs` config files. Must be composed **after** `importX` and `unicorn`                                                                        | Section 4a                                         |
+| `importX`                      | `@spudly/eslint-config/import-x`                        | eslint-plugin-import-x, every rule explicit; plus the web/client `no-cycle` relaxation generalized to `web/`/`client/` directories                                                                                     | Sections 3, 8b                                     |
+| `unicorn`                      | `@spudly/eslint-config/unicorn`                         | eslint-plugin-unicorn, every rule explicit, plus the Oct 2026 additions held `off` pending evaluation                                                                                                                  | Sections 4, 12 (unicorn part)                      |
+| `react`                        | `@spudly/eslint-config/react`                           | React rules on `@eslint-react/eslint-plugin` (see migration notes below) + eslint-plugin-react-hooks, every rule explicit                                                                                              | Sections 5 (react part), 8c, 12 (react-hooks part) |
+| `reactNative`                  | `@spudly/eslint-config/react-native`                    | The 7 react-native rules, **vendored** (see below): 5 on, 2 off, matching Eciperay severities                                                                                                                          | Section 5 (react-native part)                      |
+| `node`                         | `@spudly/eslint-config/node`                            | eslint-plugin-n for server code, every rule explicit, plus the Oct 2026 additions held `off`                                                                                                                           | Sections 6, 12 (n part)                            |
+| `jest`                         | `@spudly/eslint-config/jest`                            | eslint-plugin-jest for test/setup files (with the core/unicorn relaxations Eciperay applies in test scope), every rule explicit, plus the Oct 2026 additions held `off`                                                | Sections 7, 12 (jest part)                         |
+| `tailwind`                     | `@spudly/eslint-config/tailwind`                        | eslint-plugin-better-tailwindcss (pinned 4.5.0, the version the source config was tuned against)                                                                                                                       | Sections 8, 8a                                     |
+| `coverageIgnore`               | `@spudly/eslint-config/coverage-ignore`                 | Eciperay's custom `coverage-ignore/require-description` rule: every istanbul/c8 ignore comment must carry a `-- reason`. Applies globally, no `files` glob                                                             | Section 10                                         |
+| `noClassNameOutsideComponents` | `@spudly/eslint-config/no-classname-outside-components` | Eciperay's custom className rule (namespace `spudly-ui`): `className` only inside the components directory; see the custom-rules section for the `allowedSegment` option                                               | Section 10a                                        |
+| `typescriptPendingIgnores`     | `@spudly/eslint-config/typescript`                      | Global ignores for `*.ts`/`*.tsx`/`*.mts`/`*.cts` — the interim state while typescript-eslint lacks TS7 support (see below)                                                                                            | Top-of-file ignores block                          |
 
 ### Which repos use which subsets (planned adoption)
 
 - **Eciperay**: everything — it is the source of the rule sets.
 - **Memorize**: `typescriptPendingIgnores`, `base`, `importX`,
-  `unicorn`, `commonjsOverrides`, `react`, `reactNative`, `jest`.
-  No server (no `node`), no Tailwind.
+  `unicorn`, `commonjsOverrides`, `react`, `reactNative`, `jest`,
+  `coverageIgnore`. No server (no `node`), no Tailwind.
 - **Design system**: `typescriptPendingIgnores`, `base`, `importX`,
-  `unicorn`, `commonjsOverrides`, `react`. A library, not an app: no
-  `node`, no `jest` (tests run on `node --test`), no Tailwind, and the
-  react-native app-screen rules don't fit library primitives.
+  `unicorn`, `commonjsOverrides`, `react`, `coverageIgnore`. A library,
+  not an app: no `node`, no `jest` (tests run on `node --test`), no
+  Tailwind, and the react-native app-screen rules don't fit library
+  primitives.
+
+The `noClassNameOutsideComponents` export is currently planned for
+Eciperay only — it is the app/web className policy; the design system
+is the components library itself, and Memorize styles through
+Tamagui rather than `className`.
 
 ## React: the @eslint-react migration
 
@@ -166,6 +178,47 @@ tests on ESLint 10 (bad fixture fires, good fixture passes), including
 the two rules that are `off` by default (`sort-styles`,
 `split-platform-components`).
 
+## Custom rules (ported from Eciperay)
+
+Eciperay's two hand-written rules live in this package (moved here at
+Stephen's direction, 2026-10-24, rather than staying Eciperay-local):
+
+- **`coverage-ignore/require-description`** (export `coverageIgnore`,
+  source `src/coverage-ignore-plugin.ts`) — ported faithfully from
+  Eciperay's `eslint-rules/coverage-ignore-require-description.ts`:
+  any `istanbul ignore` / `c8 ignore` comment without a `-- reason`
+  is an error. It was already fully generic, so the shared export
+  applies it globally with no `files` glob, exactly as Eciperay's
+  section 10 did.
+- **`spudly-ui/no-classname-outside-components`** (export
+  `noClassNameOutsideComponents`, source
+  `src/no-classname-outside-components-plugin.ts`) — ported from
+  Eciperay's `eslint-rules/no-classname-outside-components.ts`, where
+  the plugin namespace was the Eciperay-specific `eciperay-ui`; the
+  shared package registers it under the generic **`spudly-ui`**
+  namespace (Eciperay's adoption PR renames its side). It reports
+  `className` JSX attributes outside the components directory, so
+  styling stays inside reusable components. Generalizations from the
+  original:
+  - The rule no longer gates itself to Eciperay's
+    `packages/app` / `packages/web` layout — applicability is the
+    export's `files` glob (any-depth `src` TSX), as with every other
+    piece of this package.
+  - "Allowed" means the file path contains a `src/components/`
+    segment (any package layout; the original hard-coded
+    `/packages/(app|web)/src/components/`), or the segment given by
+    the rule's `allowedSegment` option:
+    `'spudly-ui/no-classname-outside-components': ['error', {allowedSegment: 'src/ui'}]`.
+    The default is `src/components`.
+  - Test files (`*.test.tsx`) stay exempt, and the export keeps
+    Eciperay's config-level ignores for the components tree and test
+    files as well (the original's belt-and-braces setup).
+
+Both rules carry their original Eciperay unit tests, ported to this
+package's harness, plus Linter-API tests through the config exports
+(components file passes, test file passes, page/screen file fails,
+custom `allowedSegment` works).
+
 ## TypeScript: the interim state and the restore path
 
 typescript-eslint was the only TS parser in these repos and is
@@ -188,10 +241,6 @@ return.
 
 These stay in Eciperay when it adopts the shared config:
 
-- Its two local custom rules: `eslint-rules/coverage-ignore-require-description`
-  (istanbul ignore comments must carry a reason) and
-  `eslint-rules/no-classname-outside-components` (className only inside
-  `src/components`) — both are Eciperay-UI-specific.
 - Section 1a: `no-console` allowances for named script/server-bootstrap
   files.
 - Sections 9/9a: line-limit relaxations for TSX components and the
@@ -215,7 +264,7 @@ npm install
 npm run build       # tsc -> dist/
 npm test            # build + node --test (Linter-API tests for every export)
 npm run typecheck
-npm run lint          # dogfood: base + importX + unicorn over this repo's JS
+npm run lint          # dogfood: base + importX + unicorn + coverageIgnore over this repo's JS
 npm run prettier:check
 ```
 
