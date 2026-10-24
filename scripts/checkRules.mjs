@@ -47,6 +47,16 @@
  *     package is composable: a jest rule is decided in the jest export,
  *     not in base. What matters is that every available rule is decided
  *     *somewhere* in the package.
+ *   - The pending export (`reactPending`, subpath-only — issue #8) is
+ *     audited exactly like a composed export: the plugin it registers
+ *     counts as registered and its entries as configured/decided.
+ *     Holding the @eslint-react rules out of `react` pending TypeScript
+ *     7 support must not let them silently rot — the weekly audit keeps
+ *     them current, so restoration is a composition change against an
+ *     already-current rule set, never a catch-up rewrite. (The audit
+ *     runs on this package's own toolchain, where the pending export
+ *     loads; the TS7 load failure is the consumer fixture's job —
+ *     test/ts7Consumer.test.mjs.)
  *   - Deprecated rules are never "missing": the policy for a deprecated
  *     rule is removal, not a fresh explicit entry.
  *   - Some plugins register one rule object under several names
@@ -63,6 +73,7 @@ import {builtinRules} from 'eslint/use-at-your-own-risk';
 import prettierConfig from 'eslint-config-prettier';
 
 import * as pkg from '../dist/index.js';
+import reactPending from '../dist/react-pending.js';
 
 const EXPORTS = [
   'base',
@@ -115,8 +126,15 @@ for (const [name, rule] of builtinRules) {
   registerAvailable(name, rule, 'eslint core');
 }
 
-for (const exportName of EXPORTS) {
-  const blocks = pkg[exportName];
+// The pending export ships subpath-only (issue #8), so it is not a
+// key of the root module; it is audited alongside the root exports
+// under the name 'reactPending' (see the header's scope notes).
+const EXPORT_SOURCES = [
+  ...EXPORTS.map(name => [name, pkg[name]]),
+  ['reactPending', reactPending],
+];
+
+for (const [exportName, blocks] of EXPORT_SOURCES) {
   if (!Array.isArray(blocks)) continue;
   for (const block of blocks) {
     if (block.plugins) {

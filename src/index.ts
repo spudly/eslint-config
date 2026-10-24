@@ -39,6 +39,15 @@
  *
  * Each export is also available as a subpath import, e.g.
  * `import base from '@spudly/eslint-config/base'`.
+ *
+ * One more export exists ONLY as a subpath and is deliberately NOT
+ * re-exported here: `reactPending`
+ * (`import reactPending from '@spudly/eslint-config/react-pending'`)
+ * — the @eslint-react rule blocks, held pending TypeScript 7 support
+ * in @eslint-react's plugin chain (issue #8). Re-exporting it from
+ * the root would crash every root import under TS7, so nothing
+ * composes it yet; when upstream is TS7-compatible it folds back
+ * into `react` and the subpath disappears.
  */
 export {base} from './base.js';
 export {default as jest} from './jest.js';
