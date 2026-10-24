@@ -21,7 +21,7 @@ export const unicorn: Linter.Config[] = [
       'unicorn/consistent-existence-index-check': 'error',
       'unicorn/consistent-function-scoping': 'error',
       'unicorn/custom-error-definition': 'off', // we use plain Error objects, not custom subclasses
-      'unicorn/empty-brace-spaces': 'error',
+      'unicorn/empty-brace-spaces': 'off', // formatting owned by Prettier — eslint-config-prettier disables this in base; explicit off so the source matches the effective config
       'unicorn/error-message': 'error',
       'unicorn/escape-case': 'error',
       'unicorn/expiring-todo-comments': 'error',
@@ -60,7 +60,7 @@ export const unicorn: Linter.Config[] = [
       'unicorn/no-magic-array-flat-depth': 'error',
       'unicorn/no-negated-condition': 'error',
       'unicorn/no-negation-in-equality-check': 'error',
-      'unicorn/no-nested-ternary': 'error',
+      'unicorn/no-nested-ternary': 'off', // formatting owned by Prettier — eslint-config-prettier disables this in base; explicit off so the source matches the effective config
       'unicorn/no-new-array': 'error',
       'unicorn/no-new-buffer': 'off', // no direct Buffer usage; n/no-deprecated-api covers Node.js Buffer misuse
       'unicorn/no-null': 'off', // null is a valid value in database records and API responses
@@ -83,7 +83,7 @@ export const unicorn: Linter.Config[] = [
       'unicorn/no-useless-switch-case': 'error',
       'unicorn/no-useless-undefined': 'error',
       'unicorn/no-zero-fractions': 'error',
-      'unicorn/number-literal-case': 'error',
+      'unicorn/number-literal-case': 'off', // formatting owned by Prettier — eslint-config-prettier disables this in base; explicit off so the source matches the effective config
       'unicorn/numeric-separators-style': 'error',
       'unicorn/prefer-add-event-listener': 'off', // no DOM code in this project
       'unicorn/prefer-array-find': 'error',
@@ -140,7 +140,7 @@ export const unicorn: Linter.Config[] = [
       'unicorn/require-post-message-target-origin': 'off', // no postMessage usage in this project
       'unicorn/string-content': 'off', // too opinionated; string content choices are intentional
       'unicorn/switch-case-braces': 'error',
-      'unicorn/template-indent': 'error',
+      'unicorn/template-indent': 'off', // formatting owned by Prettier — eslint-config-prettier disables this in base; explicit off so the source matches the effective config
       'unicorn/text-encoding-identifier-case': 'error',
       'unicorn/throw-new-error': 'error',
     },
