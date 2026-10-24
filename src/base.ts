@@ -268,7 +268,7 @@ const baseCore: Linter.Config[] = [
       'no-restricted-globals': 'off', // no specific global variable restrictions
       'no-restricted-properties': 'off', // no specific property access restrictions
       'no-unassigned-vars': 'off', // TypeScript handles unused variable declarations
-      'prefer-object-has-own': 'off', // not enforced (its former unicorn replacement was removed upstream in unicorn 65)
+      'prefer-object-has-own': 'off', // Object.prototype.hasOwnProperty is explicit and familiar
     },
   },
 
