@@ -20,7 +20,10 @@ const rule: Rule.RuleModule = {
         fix(fixer) {
           const realStyleNode = jsxExpressionNode.value.expression.elements[0];
           const styleSource = context.sourceCode.getText(realStyleNode);
-          return fixer.replaceText(jsxExpressionNode.value.expression, styleSource);
+          return fixer.replaceText(
+            jsxExpressionNode.value.expression,
+            styleSource,
+          );
         },
         message:
           'Single element style arrays are not necessary and cause unnecessary re-renders',

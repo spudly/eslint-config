@@ -22,7 +22,8 @@ interface SplitPlatformOptions {
 const rule: Rule.RuleModule = {
   create(context) {
     let reactComponents: AstNode[] = [];
-    const androidMessage = 'Android components should be placed in android files';
+    const androidMessage =
+      'Android components should be placed in android files';
     const iosMessage = 'IOS components should be placed in ios files';
     const conflictMessage = "IOS and Android components can't be mixed";
     const options = context.options[0] as SplitPlatformOptions | undefined;
@@ -55,7 +56,8 @@ const rule: Rule.RuleModule = {
 
     function reportErrors(components: AstNode[], filename: string): void {
       const containsAndroidAndIOS =
-        hasNodeWithName(components, 'IOS') && hasNodeWithName(components, 'Android');
+        hasNodeWithName(components, 'IOS') &&
+        hasNodeWithName(components, 'Android');
 
       components.forEach(node => {
         const propName = getName(node) as string;
@@ -77,11 +79,13 @@ const rule: Rule.RuleModule = {
     }
 
     return {
-      ImportDeclaration(node: AstNode) {
+      'ImportDeclaration'(node: AstNode) {
         if (node.source.value === 'react-native') {
           node.specifiers.forEach((importSpecifier: AstNode) => {
             if (importSpecifier.type === 'ImportSpecifier') {
-              reactComponents = reactComponents.concat(importSpecifier.imported);
+              reactComponents = reactComponents.concat(
+                importSpecifier.imported,
+              );
             }
           });
         }
@@ -90,9 +94,11 @@ const rule: Rule.RuleModule = {
         const filename = context.filename;
         reportErrors(reactComponents, filename);
       },
-      VariableDeclarator(node: AstNode) {
-        const destructuring = node.init && node.id && node.id.type === 'ObjectPattern';
-        const statelessDestructuring = destructuring && node.init.name === 'React';
+      'VariableDeclarator'(node: AstNode) {
+        const destructuring =
+          node.init && node.id && node.id.type === 'ObjectPattern';
+        const statelessDestructuring =
+          destructuring && node.init.name === 'React';
         if (destructuring && statelessDestructuring) {
           reactComponents = reactComponents.concat(node.id.properties);
         }

@@ -35,7 +35,7 @@ const create = Components.detect(context => {
   }
 
   return {
-    JSXAttribute: (node: AstNode) => {
+    'JSXAttribute': (node: AstNode) => {
       if (astHelpers.isStyleAttribute(node)) {
         const styles = astHelpers.collectStyleObjectExpressions(
           node.value,

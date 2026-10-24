@@ -48,7 +48,10 @@ export class Components {
   add(node: AstNode, confidence: number): void {
     const id = this.getId(node);
     if (this.list[id]) {
-      if (confidence === 0 || (this.list[id] as ComponentEntry).confidence === 0) {
+      if (
+        confidence === 0 ||
+        (this.list[id] as ComponentEntry).confidence === 0
+      ) {
         (this.list[id] as ComponentEntry).confidence = 0;
       } else {
         (this.list[id] as ComponentEntry).confidence = Math.max(
@@ -225,10 +228,12 @@ function componentRule(
         const isFunction = /Function/.test(componentNode.type);
         // Ignore classes methods
         const isNotMethod =
-          !componentNode.parent || componentNode.parent.type !== 'MethodDefinition';
+          !componentNode.parent ||
+          componentNode.parent.type !== 'MethodDefinition';
         // Ignore arguments (callback, etc.)
         const isNotArgument =
-          !componentNode.parent || componentNode.parent.type !== 'CallExpression';
+          !componentNode.parent ||
+          componentNode.parent.type !== 'CallExpression';
         if (isFunction && isNotMethod && isNotArgument) {
           return componentNode;
         }
@@ -243,7 +248,10 @@ function componentRule(
       // Get the component path
       const componentPath: string[] = [];
       while (currentNode) {
-        if (currentNode.property && currentNode.property.type === 'Identifier') {
+        if (
+          currentNode.property &&
+          currentNode.property.type === 'Identifier'
+        ) {
           componentPath.push(currentNode.property.name);
         }
         if (currentNode.object && currentNode.object.type === 'Identifier') {

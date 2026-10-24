@@ -33,7 +33,9 @@ const rule: Rule.RuleModule = {
     const {ignoreClassNames} = options;
     const {ignoreStyleProperties} = options;
     const isValidOrder =
-      order === 'asc' ? (a: string, b: string) => a <= b : (a: string, b: string) => a >= b;
+      order === 'asc'
+        ? (a: string, b: string) => a <= b
+        : (a: string, b: string) => a >= b;
 
     const sourceCode = context.sourceCode;
 
@@ -69,7 +71,10 @@ const rule: Rule.RuleModule = {
           ...sourceCode.getCommentsBefore(prop),
           ...sourceCode.getCommentsAfter(prop),
         ])
-        .reduce((hasComment, comment) => hasComment || comment.length > 0, false);
+        .reduce(
+          (hasComment, comment) => hasComment || comment.length > 0,
+          false,
+        );
 
       context.report({
         fix: hasComments
@@ -94,7 +99,11 @@ const rule: Rule.RuleModule = {
       });
     }
 
-    function checkIsSorted(array: AstNode[], arrayName: string, node: AstNode): void {
+    function checkIsSorted(
+      array: AstNode[],
+      arrayName: string,
+      node: AstNode,
+    ): void {
       for (let i = 1; i < array.length; i += 1) {
         const previous = array[i - 1] as AstNode;
         const current = array[i] as AstNode;
@@ -107,9 +116,13 @@ const rule: Rule.RuleModule = {
         const currentName = getStylePropertyIdentifier(current);
 
         const oneIsShorthandForTheOther =
-          arrayName === 'style properties' && isEitherShortHand(prevName, currentName);
+          arrayName === 'style properties' &&
+          isEitherShortHand(prevName, currentName);
 
-        if (!oneIsShorthandForTheOther && !isValidOrder(prevName, currentName)) {
+        if (
+          !oneIsShorthandForTheOther &&
+          !isValidOrder(prevName, currentName)
+        ) {
           report(array, arrayName, node, previous, current);
           return;
         }

@@ -17,9 +17,7 @@ const create = Components.detect((context, components) => {
   const styleSheets = new StyleSheets();
   const styleReferences = new Set<string>();
 
-  function reportUnusedStyles(
-    unusedStyles: Record<string, AstNode[]>,
-  ): void {
+  function reportUnusedStyles(unusedStyles: Record<string, AstNode[]>): void {
     Object.keys(unusedStyles).forEach(key => {
       const styles = unusedStyles[key] as AstNode[];
       styles.forEach(node => {
@@ -36,7 +34,7 @@ const create = Components.detect((context, components) => {
   }
 
   return {
-    CallExpression: (node: AstNode) => {
+    'CallExpression': (node: AstNode) => {
       if (astHelpers.isStyleSheetDeclaration(node, context.settings)) {
         const styleSheetName = astHelpers.getStyleSheetName(node);
         const styles = astHelpers.getStyleDeclarations(node);
@@ -47,7 +45,7 @@ const create = Components.detect((context, components) => {
       }
     },
 
-    MemberExpression: (node: AstNode) => {
+    'MemberExpression': (node: AstNode) => {
       const styleRef =
         astHelpers.getPotentialStyleReferenceFromMemberExpression(node);
       if (styleRef) {

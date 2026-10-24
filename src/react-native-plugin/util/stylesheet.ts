@@ -111,17 +111,20 @@ export const astHelpers = {
   containsStyleSheetObject(node: AstNode, objectNames: string[]): boolean {
     return Boolean(
       node &&
-        node.type === 'CallExpression' &&
-        node.callee &&
-        node.callee.object &&
-        node.callee.object.name &&
-        objectNames.includes(node.callee.object.name),
+      node.type === 'CallExpression' &&
+      node.callee &&
+      node.callee.object &&
+      node.callee.object.name &&
+      objectNames.includes(node.callee.object.name),
     );
   },
 
   containsCreateCall(node: AstNode): boolean {
     return Boolean(
-      node && node.callee && node.callee.property && node.callee.property.name === 'create',
+      node &&
+      node.callee &&
+      node.callee.property &&
+      node.callee.property.name === 'create',
     );
   },
 
@@ -133,7 +136,7 @@ export const astHelpers = {
 
     return Boolean(
       astHelpers.containsStyleSheetObject(node, objectNames) &&
-        astHelpers.containsCreateCall(node),
+      astHelpers.containsCreateCall(node),
     );
   },
 
@@ -243,9 +246,9 @@ export const astHelpers = {
   isStyleAttribute(node: AstNode): boolean {
     return Boolean(
       node.type === 'JSXAttribute' &&
-        node.name &&
-        node.name.name &&
-        node.name.name.toLowerCase().includes('style'),
+      node.name &&
+      node.name.name &&
+      node.name.name.toLowerCase().includes('style'),
     );
   },
 
@@ -327,13 +330,21 @@ export const astHelpers = {
         return [styleReference];
       }
       case 'LogicalExpression': {
-        const leftStyleReferences = astHelpers.getStyleReferenceFromNode(node.left);
-        const rightStyleReferences = astHelpers.getStyleReferenceFromNode(node.right);
+        const leftStyleReferences = astHelpers.getStyleReferenceFromNode(
+          node.left,
+        );
+        const rightStyleReferences = astHelpers.getStyleReferenceFromNode(
+          node.right,
+        );
         return [...leftStyleReferences, ...rightStyleReferences];
       }
       case 'ConditionalExpression': {
-        const leftStyleReferences = astHelpers.getStyleReferenceFromNode(node.consequent);
-        const rightStyleReferences = astHelpers.getStyleReferenceFromNode(node.alternate);
+        const leftStyleReferences = astHelpers.getStyleReferenceFromNode(
+          node.consequent,
+        );
+        const rightStyleReferences = astHelpers.getStyleReferenceFromNode(
+          node.alternate,
+        );
         return [...leftStyleReferences, ...rightStyleReferences];
       }
       default: {
@@ -359,8 +370,12 @@ export const astHelpers = {
         return [...left, ...right];
       }
       case 'ConditionalExpression': {
-        const left = astHelpers.getStyleObjectExpressionFromNode(node.consequent);
-        const right = astHelpers.getStyleObjectExpressionFromNode(node.alternate);
+        const left = astHelpers.getStyleObjectExpressionFromNode(
+          node.consequent,
+        );
+        const right = astHelpers.getStyleObjectExpressionFromNode(
+          node.alternate,
+        );
         return [...left, ...right];
       }
       default: {
@@ -399,9 +414,9 @@ export const astHelpers = {
   hasArrayOfStyleReferences(node: AstNode): boolean {
     return Boolean(
       node &&
-        node.type === 'JSXExpressionContainer' &&
-        node.expression &&
-        node.expression.type === 'ArrayExpression',
+      node.type === 'JSXExpressionContainer' &&
+      node.expression &&
+      node.expression.type === 'ArrayExpression',
     );
   },
 
@@ -465,7 +480,11 @@ export const astHelpers = {
     let invalid = false;
     if (node.properties && node.properties.length) {
       node.properties.forEach((p: AstNode) => {
-        if (p.key && p.key.name && p.key.name.toLowerCase().indexOf('color') !== -1) {
+        if (
+          p.key &&
+          p.key.name &&
+          p.key.name.toLowerCase().indexOf('color') !== -1
+        ) {
           if (p.value.type === 'Literal') {
             invalid = true;
             obj[p.key.name] = p.value.value;

@@ -35,7 +35,7 @@ const create = Components.detect(context => {
   }
 
   return {
-    CallExpression: (node: AstNode) => {
+    'CallExpression': (node: AstNode) => {
       if (astHelpers.isStyleSheetDeclaration(node, context.settings)) {
         const styles = astHelpers.getStyleDeclarations(node);
 
@@ -51,7 +51,7 @@ const create = Components.detect(context => {
       }
     },
 
-    JSXAttribute: (node: AstNode) => {
+    'JSXAttribute': (node: AstNode) => {
       if (astHelpers.isStyleAttribute(node)) {
         const literals = astHelpers.collectColorLiterals(node.value, context);
         styleSheets.addColorLiterals(literals);

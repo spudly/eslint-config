@@ -32,7 +32,10 @@ const elementName = (node: AstNode): string => {
   return reversedIdentifiers.reverse().join('.');
 };
 
-const hasAllowedParent = (parent: AstNode, allowedElements: string[]): boolean => {
+const hasAllowedParent = (
+  parent: AstNode,
+  allowedElements: string[],
+): boolean => {
   let curNode = parent;
 
   while (curNode) {
@@ -68,9 +71,12 @@ const rule: Rule.RuleModule = {
     };
 
     const skippedElements = options.skip ? options.skip : [];
-    const allowedElements = ['Text', 'TSpan', 'StyledText', 'Animated.Text'].concat(
-      skippedElements,
-    );
+    const allowedElements = [
+      'Text',
+      'TSpan',
+      'StyledText',
+      'Animated.Text',
+    ].concat(skippedElements);
 
     const hasOnlyLineBreak = (value: string): boolean =>
       /^[\r\n\t\f\v]+$/.test(value.replace(/ /g, ''));
@@ -80,7 +86,8 @@ const rule: Rule.RuleModule = {
 
     return {
       JSXText(node: AstNode) {
-        if (typeof node.value !== 'string' || hasOnlyLineBreak(node.value)) return;
+        if (typeof node.value !== 'string' || hasOnlyLineBreak(node.value))
+          return;
         if (getValidation(node)) {
           report(node);
         }

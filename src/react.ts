@@ -72,8 +72,7 @@ export const react: Linter.Config[] = [
       '@eslint-react/no-missing-key': 'error', // react/jsx-key
       '@eslint-react/jsx-no-comment-textnodes': 'error', // react/jsx-no-comment-textnodes
       '@eslint-react/jsx-no-children-prop': 'error', // react/no-children-prop
-      '@eslint-react/dom-no-dangerously-set-innerhtml-with-children':
-        'error', // react/no-danger-with-children
+      '@eslint-react/dom-no-dangerously-set-innerhtml-with-children': 'error', // react/no-danger-with-children
       '@eslint-react/no-component-will-mount': 'error', // react/no-deprecated (split equivalent)
       '@eslint-react/no-component-will-receive-props': 'error', // react/no-deprecated (split equivalent)
       '@eslint-react/no-component-will-update': 'error', // react/no-deprecated (split equivalent)
