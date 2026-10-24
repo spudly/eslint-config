@@ -280,6 +280,25 @@ npm run prettier:check
 npm run check-rules   # config-currency audit (see below)
 ```
 
+### Rule fixtures
+
+Every rule this package enables has one markdown file under
+`test/rules/<plugin>/<rule>.md` (core ESLint rules under
+`test/rules/core/`). Each file is documentation and a behavior test
+at the same time: it describes the rule, shows its configured entry,
+and carries a Bad snippet that must trigger the rule and a Good
+snippet that must not, both linted with the real ESLint class under
+the composed export the file names in its Test setup section.
+`test/ruleFixtures.test.mjs` parses the files (parser:
+`test/ruleDocs.mjs`) and registers one test per rule; a coverage
+test enumerates every enabled rule across all exports and fails if
+any rule lacks a file — so enabling a new rule (for example via the
+weekly `check-rules` flow) requires adding its fixture. A rule that
+no snippet can trigger (it needs real files on disk, module
+resolution, or globals the export does not declare) documents why in
+a `## Not snippet-testable` section instead of Bad/Good, and the
+harness reports it as a documented skip.
+
 ## Config currency: `check-rules`
 
 The config's value depends on staying complete and current as ESLint
