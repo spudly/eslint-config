@@ -264,7 +264,7 @@ under ESLint 10; the script's header documents the scope decisions
 (the upstream-owned eslint-config-prettier block, @eslint-react's
 `x-` alias names, and plugin rules whose plugin is not installed).
 
-**Weekly process:** Igor runs `check-rules` once a week and raises a
+**Weekly process:** An AI agent runs `check-rules` once a week and raises a
 normal PR for any findings — removals for deprecated/removed rules,
 explicit entries (severity + reasoning stated per rule) for new rules.
 A clean week produces no PR and no noise. The changes always land as
