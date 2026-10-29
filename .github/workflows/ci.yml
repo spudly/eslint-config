@@ -16,8 +16,8 @@ concurrency:
   cancel-in-progress: true
 
 # Least-privilege default (#23): no job receives any GITHUB_TOKEN scope
-# unless it declares what it needs. The ci job declares contents +
-# packages read below; merge-guard declares its own pull-requests read;
+# unless it declares what it needs. The ci job declares contents read
+# below; merge-guard declares its own pull-requests read;
 # ci-gate calls no API and needs none. release.yml is a separate
 # workflow and declares the write scopes it needs there.
 permissions: {}
@@ -28,7 +28,9 @@ jobs:
     timeout-minutes: 15
     permissions:
       contents: read # Required by actions/checkout
-      packages: read # Required by npm ci, which installs @spudly packages from GitHub Packages
+      # No packages scope: npm ci installs only public npmjs dependencies
+      # (the lockfile has no GitHub Packages resolutions and no @spudly/*
+      # dependencies), so no package read is needed.
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
