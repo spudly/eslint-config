@@ -15,10 +15,20 @@ concurrency:
   group: ci-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+# Least-privilege default (#23): no job receives any GITHUB_TOKEN scope
+# unless it declares what it needs. The ci job declares contents +
+# packages read below; merge-guard declares its own pull-requests read;
+# ci-gate calls no API and needs none. release.yml is a separate
+# workflow and declares the write scopes it needs there.
+permissions: {}
+
 jobs:
   ci:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    permissions:
+      contents: read
+      packages: read
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
