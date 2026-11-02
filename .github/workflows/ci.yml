@@ -58,6 +58,10 @@ jobs:
   # upstream changelogs, which can contain task lists we did not
   # author. The `edited` trigger above re-runs this job when the
   # body changes, so ticking the last box turns the gate green.
+  # One item is exempt on every PR: the template's "CI is green"
+  # box is self-referential — this job is part of CI (ci-gate
+  # needs it), so CI could never be green while the box is
+  # required. The required checks enforce CI greenness directly.
   merge-guard:
     name: merge-guard
     if: github.event.pull_request.user.login != 'dependabot[bot]'
@@ -85,6 +89,10 @@ jobs:
           // not tasks either: skip them. A fence only closes with
           // the marker that opened it (a ~~~ line inside a ```
           // block is content, not a fence).
+          // Self-referential items are exempt (see the job comment
+          // above): the "CI is green" box can never be true while
+          // this job is failing on it.
+          const selfReferential = /^CI is green\b/i;
           const open = [];
           let fenceMarker = null;
           for (const line of uncommented.split('\n')) {
@@ -95,9 +103,11 @@ jobs:
               continue;
             }
             if (fenceMarker !== null) continue;
+            const item = line.replace(/^\s*[-*+]\s+\[\s\]\s+/, '');
             if (
               /^\s*[-*+]\s+\[\s\]\s+\S/.test(line) &&
-              !line.includes('~~')
+              !line.includes('~~') &&
+              !selfReferential.test(item)
             ) {
               open.push(line.trim());
             }
