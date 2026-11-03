@@ -33,9 +33,10 @@ reviews:
           into react.
         - Any rule intentionally set to 'off' must carry a rationale comment;
           flag unexplained 'off' entries. Deprecated/removed and new/missing
-          rules are handled by the eslint-find-rules currency script
+          rules are audited by `npm run check-rules`
           (scripts/checkRules.mjs).
-        - TypeScript style: use type aliases, never interfaces.
+        - TypeScript style: use type aliases, never interfaces, outside
+          vendored code under src/react-native-plugin/ (upstream-owned).
     - path: 'src/react-pending.ts'
       instructions: |
         This file preserves the @eslint-react rules in the reactPending

@@ -51,13 +51,14 @@ that follows them, and do not suggest patterns that contradict them.
 ## Rule currency
 
 - Deprecated/removed and new/missing rules are tracked by the
-  eslint-find-rules currency script (`scripts/checkRules.mjs`,
+  rule-currency audit (`scripts/checkRules.mjs`, run via
   `npm run check-rules`). Any rule intentionally set to `'off'` must
   carry a rationale comment — flag unexplained `'off'` entries.
 
 ## General
 
-- TypeScript: use type aliases, never `interface`.
+- TypeScript: use type aliases, never `interface` — except in vendored
+  code under `src/react-native-plugin/`, which is upstream-owned.
 - `package-lock.json` is never hand-edited; it is regenerated with the
   pinned npm (`npm@10.9.4`, the `packageManager` field in
   `package.json`). Flag lockfile diffs that look hand-edited or are
