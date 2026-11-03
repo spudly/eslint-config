@@ -52,6 +52,8 @@ const baseCore: Linter.Config[] = [
         'error',
         {max: 150, skipBlankLines: true, skipComments: true},
       ],
+      // warn since 2026-10-24 (issue #27 severity policy: promote to
+      // 'error' on/after 2026-11-24 by the monthly promotion task)
       'max-lines-per-function': [
         'warn',
         {max: 30, skipBlankLines: true, skipComments: true},
@@ -280,10 +282,10 @@ const baseCore: Linter.Config[] = [
     files: ['**/*.{js,cjs,mjs}'],
     rules: {
       'default-param-last': 'error',
-      'dot-notation': 'warn',
+      'dot-notation': 'warn', // warn since 2026-10-24 (issue #27: promote on/after 2026-11-24)
       'max-params': ['error', {max: 4}],
       'no-array-constructor': 'error',
-      'no-empty-function': 'warn',
+      'no-empty-function': 'warn', // warn since 2026-10-24 (issue #27: promote on/after 2026-11-24)
       'no-implied-eval': 'error',
       'no-redeclare': 'error',
       'no-throw-literal': 'error',

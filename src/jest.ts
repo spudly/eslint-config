@@ -63,16 +63,16 @@ export const jest: Linter.Config[] = [
 
       // jest — all 63 rules
       'jest/consistent-test-it': 'off', // both `test` and `it` are acceptable
-      'jest/expect-expect': 'warn',
+      'jest/expect-expect': 'warn', // warn since 2026-10-24 (issue #27: promote on/after 2026-11-24)
       'jest/max-expects': 'off', // not limiting expects per test; clarity over brevity
       'jest/max-nested-describe': 'off', // not limiting describe nesting depth
       'jest/no-alias-methods': 'error',
-      'jest/no-commented-out-tests': 'warn',
+      'jest/no-commented-out-tests': 'warn', // warn since 2026-10-24 (issue #27: promote on/after 2026-11-24)
       'jest/no-conditional-expect': 'error',
       'jest/no-conditional-in-test': 'off', // some conditional logic in test setup is acceptable
       'jest/no-confusing-set-timeout': 'off', // not using setTimeout in tests
       'jest/no-deprecated-functions': 'error',
-      'jest/no-disabled-tests': 'warn',
+      'jest/no-disabled-tests': 'warn', // warn since 2026-10-24 (issue #27: promote on/after 2026-11-24)
       'jest/no-done-callback': 'error',
       'jest/no-duplicate-hooks': 'off', // multiple beforeEach in different describe blocks is acceptable
       'jest/no-export': 'error',

@@ -336,3 +336,56 @@ opens a Version Packages PR and publishes to GitHub Packages. The
 release workflow needs the repository setting **"Allow GitHub Actions
 to create and approve pull requests"** enabled (Settings -> Actions ->
 General), the same toggle the design-system repo uses.
+
+## Rule severity policy
+
+Every rule in this config is severity `'error'` by default
+(Stephen, 2026-11-03, issue #27).
+
+The one exception: a **newly enabled rule starts at `'warn'`**,
+because the consumer repos (Eciperay, Memorize, and the design
+system) have not yet fixed the violations it flags. After a rule
+has been a warning for **one month**, it is **promoted to
+`'error'`** — a month gives consumers time to upgrade and fix.
+
+How additions and promotions work:
+
+- When a PR enables a new rule at `'warn'` (for example via the
+  `check-rules` currency flow), the PR records the date the rule
+  entered at `'warn'`: a `warn since <date>` comment at the rule's
+  entry in `src/` and a row in the audit table below, whose
+  promotion date is one month after that date. A direct
+  same-semantics replacement of a removed rule is not a new rule:
+  it keeps the replaced rule's severity.
+- A monthly scheduled task (the 1st of the month) promotes every
+  rule whose promotion date has passed, via a normal PR with a
+  changeset. The same monthly run also runs `check-rules` and
+  ships any currency changes it calls for as their own separate
+  PR (for issue #2), so currency and promotion merge
+  independently.
+- Rules held in pending exports that consumers do not actually
+  receive at `'warn'` severity (for example the TypeScript 7
+  pending sets) do not count as warnings under this policy.
+
+### Current `'warn'` audit (2026-11-03)
+
+Every rule currently shipped at `'warn'` in a composed export,
+with the date it was set to `'warn'` in this repo (git history:
+all six entered in the initial package PR #1, commit `eb38f08`,
+on 2026-10-24). None has been at `'warn'` for a month yet, so
+**no promotions are due as of 2026-11-03**; all six become due
+on 2026-11-24 and are picked up by the next monthly promotion
+run after that date.
+
+| Rule                           | Export | Warn since | Promote on/after |
+| ------------------------------ | ------ | ---------- | ---------------- |
+| `max-lines-per-function`       | `base` | 2026-10-24 | 2026-11-24       |
+| `dot-notation` (JS files)      | `base` | 2026-10-24 | 2026-11-24       |
+| `no-empty-function` (JS files) | `base` | 2026-10-24 | 2026-11-24       |
+| `jest/expect-expect`           | `jest` | 2026-10-24 | 2026-11-24       |
+| `jest/no-commented-out-tests`  | `jest` | 2026-10-24 | 2026-11-24       |
+| `jest/no-disabled-tests`       | `jest` | 2026-10-24 | 2026-11-24       |
+
+The `reactPending` export and `typescriptPendingIgnores` were
+checked as part of this audit: neither ships any rule at `'warn'`
+severity, so neither contributes an entry to the table.
