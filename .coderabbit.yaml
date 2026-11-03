@@ -54,9 +54,12 @@ reviews:
     - path: 'package.json'
       instructions: |
         The exports map stays small: ., ./base, ./jest, ./node, ./react,
-        ./react-pending, ./react-native, ./tailwind, ./typescript. Flag new
-        subpath exports for rule groups that belong in base. The
-        packageManager field pins npm@10.9.4; flag changes to it.
+        ./react-pending, ./react-native, ./tailwind, ./typescript. Removing
+        ./react-pending is allowed only as part of the documented
+        restoration, once a TypeScript 7-compatible @eslint-react release
+        is proven by the TS7 consumer fixture. Flag new subpath exports
+        for rule groups that belong in base. The packageManager field pins
+        npm@10.9.4; flag changes to it.
     - path: 'package-lock.json'
       instructions: |
         This file is never hand-edited; it is regenerated with the pinned
