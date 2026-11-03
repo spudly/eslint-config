@@ -296,6 +296,34 @@ const baseCore: Linter.Config[] = [
       'require-await': 'error',
     },
   },
+
+  // ─── 1c. Test files — exempt from the line-count rules (issue #29) ───────
+  // Line limits on tests push splits that add friction without protecting
+  // production code: tests should be as long as the behavior they cover
+  // needs (a page-level test file crossing max-lines is what forced
+  // design-system #402's split). The `jest` export already carries this
+  // exemption, but only for consumers who compose it; this block puts it
+  // in `base` so every consumer gets it, whatever test framework they
+  // run. The globs are exactly the test-file patterns the `jest` export
+  // uses for its overrides — test/spec suffixes, the jest setup/env
+  // filenames, and `__tests__/` — not new patterns. Non-test files keep
+  // the section-1 limits unchanged. This is a scoping change to existing
+  // rules, not a new rule enable, so the issue #27 severity policy's
+  // warn-in period does not apply.
+  {
+    files: [
+      '**/*.test.{ts,js,tsx,jsx,cjs}',
+      '**/*.spec.{ts,js}',
+      '**/jest.setup.{ts,js,cjs}',
+      '**/jest.env.{ts,js}',
+      '**/jest.setupEnv.{ts,js}',
+      '**/__tests__/**/*.{ts,tsx,js,jsx}',
+    ],
+    rules: {
+      'max-lines': 'off',
+      'max-lines-per-function': 'off',
+    },
+  },
 ];
 
 /**
