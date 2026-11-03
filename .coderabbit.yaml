@@ -31,8 +31,9 @@ reviews:
           TypeScript 7-compatible @eslint-react release is proven by the
           TS7 consumer fixture (test/ts7Consumer.test.mjs), may fold it
           into react.
-        - Any rule intentionally set to 'off' must carry a rationale comment;
-          flag unexplained 'off' entries. Deprecated/removed and new/missing
+        - Any new or modified rule intentionally set to 'off' must carry a
+          rationale comment; flag unexplained 'off' entries in changed code.
+          Deprecated/removed and new/missing
           rules are audited by `npm run check-rules`
           (scripts/checkRules.mjs).
         - TypeScript style: use type aliases, never interfaces, outside

@@ -52,8 +52,9 @@ that follows them, and do not suggest patterns that contradict them.
 
 - Deprecated/removed and new/missing rules are tracked by the
   rule-currency audit (`scripts/checkRules.mjs`, run via
-  `npm run check-rules`). Any rule intentionally set to `'off'` must
-  carry a rationale comment — flag unexplained `'off'` entries.
+  `npm run check-rules`). Any new or modified rule intentionally set to
+  `'off'` must carry a rationale comment — flag unexplained `'off'`
+  entries in changed code.
 
 ## General
 
