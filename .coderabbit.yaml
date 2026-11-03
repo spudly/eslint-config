@@ -22,6 +22,15 @@ reviews:
         - typescript-eslint and the @eslint-react chain stay disabled until
           they support TypeScript 7. Flag PRs that re-enable them in active
           exports.
+        - reactPending (src/react-pending.ts) is a subpath-only export
+          (@spudly/eslint-config/react-pending). Flag any change anywhere
+          under src/** — including a re-export from src/index.ts — that
+          re-exports it from the package root or folds it into react or
+          another active export, because that re-breaks root imports under
+          TypeScript 7. Exception: the documented restoration, once a
+          TypeScript 7-compatible @eslint-react release is proven by the
+          TS7 consumer fixture (test/ts7Consumer.test.mjs), may fold it
+          into react.
         - Any rule intentionally set to 'off' must carry a rationale comment;
           flag unexplained 'off' entries. Deprecated/removed and new/missing
           rules are handled by the eslint-find-rules currency script
@@ -29,12 +38,17 @@ reviews:
         - TypeScript style: use type aliases, never interfaces.
     - path: 'src/react-pending.ts'
       instructions: |
-        This file preserves the @eslint-react rules verbatim in the
-        reactPending export while @eslint-react lacks TypeScript 7 support.
-        It is a subpath-only export (@spudly/eslint-config/react-pending):
-        it must not be re-exported from src/index.ts or folded into react.
-        Flag any edit that alters the preserved rule set or moves these rules
-        into an active export.
+        This file preserves the @eslint-react rules in the reactPending
+        export while @eslint-react lacks TypeScript 7 support. It is a
+        subpath-only export (@spudly/eslint-config/react-pending): while
+        the hold lasts it must not be re-exported from src/index.ts or
+        folded into react. Flag any edit that alters the preserved rule set
+        or moves these rules into an active export — except audit-driven
+        currency updates from the check-rules script (deprecated removals,
+        explicit entries for new rules), which are required maintenance,
+        and the documented restoration into react once a TypeScript
+        7-compatible @eslint-react release is proven by the TS7 consumer
+        fixture.
     - path: 'package.json'
       instructions: |
         The exports map stays small: ., ./base, ./jest, ./node, ./react,

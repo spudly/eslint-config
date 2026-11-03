@@ -13,8 +13,13 @@ that follows them, and do not suggest patterns that contradict them.
   groups that belong inside `base` — import-x, unicorn, the CommonJS
   overrides, and the coverage-ignore rule already fold into `base`.
 - `reactPending` (`src/react-pending.ts`) exists only as the subpath
-  export `@spudly/eslint-config/react-pending`. It must never be
-  re-exported from `src/index.ts` or folded into `react`.
+  export `@spudly/eslint-config/react-pending`. While the TypeScript 7
+  hold lasts, it must not be re-exported from `src/index.ts` or folded
+  into `react`. The one exception is the documented restoration: once a
+  TypeScript 7-compatible `@eslint-react` release is proven by the TS7
+  consumer fixture (`test/ts7Consumer.test.mjs`), folding it into
+  `react` is the planned restoration, not a violation (see the restore
+  path in `src/react-pending.ts`).
 
 ## No path overrides in the shared config
 
@@ -35,9 +40,13 @@ that follows them, and do not suggest patterns that contradict them.
 - `typescript-eslint` and the `@eslint-react` chain are disabled because
   they do not support TypeScript 7 yet. Flag PRs that re-enable them in
   active exports before upstream TS7 support lands.
-- The `@eslint-react` rules are preserved verbatim in
-  `src/react-pending.ts`. Flag any edit that alters the preserved rule
-  set or moves those rules into `react` or another active export.
+- The `@eslint-react` rules are preserved in `src/react-pending.ts`.
+  Flag any edit that alters the preserved rule set or moves those rules
+  into `react` or another active export — with two exceptions:
+  audit-driven currency updates from the check-rules script (removing
+  deprecated rules, adding explicit entries for new ones) are required
+  maintenance, not drift; and the documented restoration above may move
+  the rules into `react` once the TS7 condition is met.
 
 ## Rule currency
 
