@@ -1,0 +1,111 @@
+name: merge-guard
+
+# Split out of ci.yml: editing the PR body (for example ticking a
+# checklist checkbox) fires an `edited` pull_request event, and the
+# merge-guard job below must re-check the body when it changes.
+# While the job lived in ci.yml, `edited` had to trigger that whole
+# workflow, so every body edit re-ran the full build. Now `edited`
+# triggers only this workflow: a body edit re-runs only this cheap
+# check, and a push runs the build exactly once in ci.yml.
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, edited]
+
+# Least-privilege default (#23): no job receives any GITHUB_TOKEN
+# scope unless it declares what it needs; the job below declares
+# its own pull-requests read.
+permissions: {}
+
+# Cancel superseded runs for the same PR (mirrors ci.yml): a run
+# started by an earlier body edit must not finish last and leave a
+# stale result on the head.
+concurrency:
+  group: merge-guard-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  # Fails when the PR body still contains unchecked task-list
+  # items, so the PR template's pre-merge checklist is enforced
+  # rather than advisory. An item counts as waived when it is
+  # struck through (the template's "struck through with a reason"
+  # convention). Dependabot PRs are exempt: their bodies quote
+  # upstream changelogs, which can contain task lists we did not
+  # author. The `edited` trigger above re-runs this job when the
+  # body changes, so ticking the last box turns the gate green.
+  # One item is exempt on every PR: the old template's "CI is
+  # green" box is self-referential — this check is part of CI, so
+  # CI could never be green while the box is required. The box has
+  # been removed from the template (the required ci-gate check
+  # enforces CI greenness directly), but PRs created from the old
+  # template still carry it in their bodies, so the exemption
+  # stays for them.
+  merge-guard:
+    name: merge-guard
+    if: github.event.pull_request.user.login != 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      pull-requests: read
+    steps:
+      - name: Fetch PR body
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh api "repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}" --jq '.body // ""' > "$RUNNER_TEMP/pr-body.md"
+      - name: Check for unchecked task-list items
+        run: |
+          node <<'EOF'
+          const fs = require('node:fs');
+          const body = fs.readFileSync(
+            process.env.RUNNER_TEMP + '/pr-body.md',
+            'utf8',
+          );
+          // Task-list syntax inside HTML comments is documentation,
+          // not a task: strip comments before scanning.
+          const uncommented = body.replace(/<!--[\s\S]*?-->/g, '');
+          // Lines inside fenced code blocks are quoted examples,
+          // not tasks either: skip them. A fence only closes with
+          // the marker that opened it (a ~~~ line inside a ```
+          // block is content, not a fence).
+          // Self-referential items are exempt (see the job comment
+          // above): the old template's "CI is green" box can never
+          // be true while this job is failing on it. The match is
+          // the item's full text, so a differently worded item that
+          // merely starts with "CI is green" stays enforced.
+          const selfReferential = /^CI is green for the exact head commit\.?$/i;
+          const open = [];
+          let fenceMarker = null;
+          for (const line of uncommented.split('\n')) {
+            const fence = line.match(/^\s*(```|~~~)/);
+            if (fence) {
+              if (fenceMarker === null) fenceMarker = fence[1];
+              else if (fence[1] === fenceMarker) fenceMarker = null;
+              continue;
+            }
+            if (fenceMarker !== null) continue;
+            const item = line
+              .replace(/^\s*[-*+]\s+\[\s\]\s+/, '')
+              .trim();
+            if (
+              /^\s*[-*+]\s+\[\s\]\s+\S/.test(line) &&
+              !line.includes('~~') &&
+              !selfReferential.test(item)
+            ) {
+              open.push(line.trim());
+            }
+          }
+          if (open.length > 0) {
+            console.log(
+              'Unchecked task-list items remain in the PR body:',
+            );
+            for (const item of open) console.log('  ' + item);
+            console.log(
+              'Check each item off, or strike it through with a reason, before merging.',
+            );
+            process.exit(1);
+          }
+          console.log(
+            'All task-list items in the PR body are complete or waived.',
+          );
+          EOF
