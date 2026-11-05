@@ -18,6 +18,13 @@ on:
 # its own pull-requests read.
 permissions: {}
 
+# Cancel superseded runs for the same PR (mirrors ci.yml): a run
+# started by an earlier body edit must not finish last and leave a
+# stale result on the head.
+concurrency:
+  group: merge-guard-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
 jobs:
   # Fails when the PR body still contains unchecked task-list
   # items, so the PR template's pre-merge checklist is enforced
@@ -27,10 +34,13 @@ jobs:
   # upstream changelogs, which can contain task lists we did not
   # author. The `edited` trigger above re-runs this job when the
   # body changes, so ticking the last box turns the gate green.
-  # One item is exempt on every PR: the template's "CI is green"
-  # box is self-referential — this job is part of CI (ci-gate
-  # needs it), so CI could never be green while the box is
-  # required. The required checks enforce CI greenness directly.
+  # One item is exempt on every PR: the old template's "CI is
+  # green" box is self-referential — this check is part of CI, so
+  # CI could never be green while the box is required. The box has
+  # been removed from the template (the required ci-gate check
+  # enforces CI greenness directly), but PRs created from the old
+  # template still carry it in their bodies, so the exemption
+  # stays for them.
   merge-guard:
     name: merge-guard
     if: github.event.pull_request.user.login != 'dependabot[bot]'
@@ -59,9 +69,9 @@ jobs:
           // the marker that opened it (a ~~~ line inside a ```
           // block is content, not a fence).
           // Self-referential items are exempt (see the job comment
-          // above): the "CI is green" box can never be true while
-          // this job is failing on it. The match is the template
-          // item's full text, so a differently worded item that
+          // above): the old template's "CI is green" box can never
+          // be true while this job is failing on it. The match is
+          // the item's full text, so a differently worded item that
           // merely starts with "CI is green" stays enforced.
           const selfReferential = /^CI is green for the exact head commit\.?$/i;
           const open = [];
