@@ -11,7 +11,6 @@
 All boxes must be checked (or struck through with a one-line reason)
 before this PR is merged.
 
-- [ ] Review feedback addressed (Copilot and/or human)
 - [ ] No new console or CI warnings introduced — or a GitHub issue filed
       for each new one
 - [ ] Changeset added, or not required
