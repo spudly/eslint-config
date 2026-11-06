@@ -35,6 +35,7 @@ test('semver range semantics used by the lockfile check', () => {
   assert.equal(satisfies('9.9.9', '>=8.0.0 <11.0.0'), true);
   assert.equal(satisfies('11.0.0', '>=8.0.0 <11.0.0'), false);
   assert.equal(satisfies('1.2.3-beta.1', '1.2.3-beta.1'), true);
+  assert.equal(satisfies('1.2.0', '^1.2.3-beta.1'), false);
   assert.equal(satisfies('1.2.3+build.1', '1.2.3'), true);
   assert.equal(satisfies('1.3.0', '>1.2'), true);
   assert.equal(satisfies('1.2.1', '>1.2'), false);
