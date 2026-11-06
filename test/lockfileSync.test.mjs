@@ -44,9 +44,7 @@ test('semver range semantics used by the lockfile check', () => {
   assert.equal(satisfies('2.3.5', '1.2.3 - 2.3.4'), false);
 });
 
-test('every direct dependency locked version satisfies its spec', () => {
-  const manifest = readJson('../package.json');
-  const lockfile = readJson('../package-lock.json');
+function staleEntries(manifest, lockfile) {
   const direct = {
     ...manifest.dependencies,
     ...manifest.devDependencies,
@@ -60,5 +58,25 @@ test('every direct dependency locked version satisfies its spec', () => {
       stale.push(`${name}: locked ${locked} does not satisfy "${spec}"`);
     }
   }
-  assert.deepEqual(stale, []);
+  return stale;
+}
+
+test('the checker reports missing and out-of-range locked entries', () => {
+  const manifest = {dependencies: {foo: '^1.0.0', bar: '^2.0.0'}};
+  const lockfile = {packages: {'node_modules/foo': {version: '1.0.0'}}};
+  assert.deepEqual(staleEntries(manifest, lockfile), [
+    'bar: spec "^2.0.0" has no locked entry',
+  ]);
+  lockfile.packages['node_modules/bar'] = {version: '1.5.0'};
+  assert.deepEqual(staleEntries(manifest, lockfile), [
+    'bar: locked 1.5.0 does not satisfy "^2.0.0"',
+  ]);
+  lockfile.packages['node_modules/bar'] = {version: '2.1.0'};
+  assert.deepEqual(staleEntries(manifest, lockfile), []);
+});
+
+test('every direct dependency locked version satisfies its spec', () => {
+  const manifest = readJson('../package.json');
+  const lockfile = readJson('../package-lock.json');
+  assert.deepEqual(staleEntries(manifest, lockfile), []);
 });
