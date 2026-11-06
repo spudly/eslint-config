@@ -45,12 +45,14 @@ test('semver range semantics used by the lockfile check', () => {
 });
 
 function staleEntries(manifest, lockfile) {
-  const direct = {
-    ...manifest.dependencies,
-    ...manifest.devDependencies,
-  };
+  // Each section is checked separately: a package declared in both
+  // must satisfy both specs, never just the later section's.
+  const declarations = [
+    ...Object.entries(manifest.dependencies ?? {}),
+    ...Object.entries(manifest.devDependencies ?? {}),
+  ];
   const stale = [];
-  for (const [name, spec] of Object.entries(direct)) {
+  for (const [name, spec] of declarations) {
     const locked = lockfile.packages?.[`node_modules/${name}`]?.version;
     if (!locked) {
       stale.push(`${name}: spec "${spec}" has no locked entry`);
@@ -76,6 +78,14 @@ test('the checker reports missing and out-of-range locked entries', () => {
   const devManifest = {devDependencies: {bar: '^2.0.0'}};
   const devLockfile = {packages: {'node_modules/bar': {version: '1.5.0'}}};
   assert.deepEqual(staleEntries(devManifest, devLockfile), [
+    'bar: locked 1.5.0 does not satisfy "^2.0.0"',
+  ]);
+  const bothManifest = {
+    dependencies: {bar: '^2.0.0'},
+    devDependencies: {bar: '^1.0.0'},
+  };
+  const bothLockfile = {packages: {'node_modules/bar': {version: '1.5.0'}}};
+  assert.deepEqual(staleEntries(bothManifest, bothLockfile), [
     'bar: locked 1.5.0 does not satisfy "^2.0.0"',
   ]);
 });
