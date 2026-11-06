@@ -73,6 +73,11 @@ test('the checker reports missing and out-of-range locked entries', () => {
   ]);
   lockfile.packages['node_modules/bar'] = {version: '2.1.0'};
   assert.deepEqual(staleEntries(manifest, lockfile), []);
+  const devManifest = {devDependencies: {bar: '^2.0.0'}};
+  const devLockfile = {packages: {'node_modules/bar': {version: '1.5.0'}}};
+  assert.deepEqual(staleEntries(devManifest, devLockfile), [
+    'bar: locked 1.5.0 does not satisfy "^2.0.0"',
+  ]);
 });
 
 test('every direct dependency locked version satisfies its spec', () => {
