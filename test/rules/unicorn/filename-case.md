@@ -13,7 +13,7 @@ Requires filenames to be camelCase or PascalCase (with a small ignore list for c
     'error',
     {
       cases: {camelCase: true, pascalCase: true},
-      ignore: [/^react-native\.config\.(?:js|cjs)$/u, /^(?:__tests__|__mocks__|mcp-server)$/u],
+      ignore: [/^react-native\.config\.(?:js|cjs)$/u, /^(?:__tests__|__mocks__|__snapshots__|mcp-server)$/u, /^.+\.(?:test|test\.e2e|stories)\.[^.]+$/u],
     },
   ],
   // ...

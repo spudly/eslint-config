@@ -22,6 +22,7 @@ export const jest: Linter.Config[] = [
   {
     files: [
       '**/*.test.{ts,js,tsx,jsx,cjs}',
+      '**/*.test.e2e.{ts,tsx,js,jsx}',
       '**/*.spec.{ts,js}',
       '**/jest.setup.{ts,js,cjs}',
       '**/jest.env.{ts,js}',
@@ -132,7 +133,11 @@ export const jest: Linter.Config[] = [
   // Disabled pending individual evaluation, which preserves prior lint
   // behavior exactly (none of them were applied before).
   {
-    files: ['**/*.test.{ts,js,tsx,jsx,cjs}', '**/*.spec.{ts,js}'],
+    files: [
+      '**/*.test.{ts,js,tsx,jsx,cjs}',
+      '**/*.test.e2e.{ts,tsx,js,jsx}',
+      '**/*.spec.{ts,js}',
+    ],
     plugins: {jest: jestPlugin},
     rules: {
       // eslint-plugin-jest additions
