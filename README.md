@@ -246,7 +246,7 @@ composed one, so its rules stay current while they wait.
 Restore condition: an `@eslint-react` / `eslint-plugin-react-x`
 release whose `ts-api-utils` chain initializes under TypeScript 7.x.
 It is proven by the TypeScript 7 consumer fixture
-(`test/ts7Consumer.test.mjs`), which installs the packed package
+(`test/ts7Consumer.test.ts`), which installs the packed package
 next to `typescript@^7` and asserts the composed exports load and
 lint there — and whose pending tripwire goes red the day
 `reactPending` itself loads. Restoration is then a composition
@@ -303,8 +303,8 @@ at the same time: it describes the rule, shows its configured entry,
 and carries a Bad snippet that must trigger the rule and a Good
 snippet that must not, both linted with the real ESLint class under
 the composed export the file names in its Test setup section.
-`test/ruleFixtures.test.mjs` parses the files (parser:
-`test/ruleDocs.mjs`) and registers one test per rule; a coverage
+`test/ruleFixtures.test.ts` parses the files (parser:
+`test/ruleDocs.ts`) and registers one test per rule; a coverage
 test enumerates every enabled rule across all exports and fails if
 any rule lacks a file — so enabling a new rule (for example via the
 weekly `check-rules` flow) requires adding its fixture. A rule that

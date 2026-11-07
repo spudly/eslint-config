@@ -12,14 +12,14 @@ import reactPending from '../dist/react-pending.js';
 const reactRestored = [...react, ...reactPending];
 
 const linter = new Linter();
-const jsxLang = {
+const jsxLang: Linter.Config = {
   languageOptions: {
     parserOptions: {ecmaFeatures: {jsx: true}},
     sourceType: 'module',
   },
 };
 
-function ruleIds(code, config, filename = 'Comp.jsx') {
+function ruleIds(code: string, config: Linter.Config[], filename = 'Comp.jsx') {
   return linter
     .verify(code, [jsxLang, ...config], {filename})
     .map(m => m.ruleId);
@@ -75,8 +75,8 @@ const EVALUATED_ERROR_RULES = [
   '@eslint-react/naming-convention-ref-name',
 ];
 
-function pendingSeverity(ruleId) {
-  let result;
+function pendingSeverity(ruleId: string) {
+  let result: unknown;
   for (const block of reactPending) {
     if (block.rules && ruleId in block.rules) {
       const entry = block.rules[ruleId];

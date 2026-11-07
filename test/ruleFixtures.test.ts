@@ -5,14 +5,16 @@ import {test} from 'node:test';
 import {URL, fileURLToPath} from 'node:url';
 
 import {ESLint} from 'eslint';
+import type {Linter} from 'eslint';
 
-import {EXPORTS, loadEnabledRules} from './enabledRules.mjs';
-import {parseRuleDoc, ruleIdForPath} from './ruleDocs.mjs';
+import {EXPORTS, loadEnabledRules} from './enabledRules.ts';
+import {parseRuleDoc, ruleIdForPath} from './ruleDocs.ts';
+import type {RuleDoc} from './ruleDocs.ts';
 
 // Markdown-driven rule behavior tests (Stephen's design, 2026-10-24,
 // follow-up to the Option A suite from issue #3): every enabled rule
 // has one markdown file under test/rules/ that is its documentation
-// AND its behavior fixture. The parser (ruleDocs.mjs) turns each file
+// AND its behavior fixture. The parser (ruleDocs.ts) turns each file
 // into a test: the Bad snippet must trigger the rule and the Good
 // snippet must not, both linted with the real ESLint class under the
 // composed export the file names. Other rules firing on a snippet is
@@ -26,8 +28,7 @@ import {parseRuleDoc, ruleIdForPath} from './ruleDocs.mjs';
 
 const rulesDir = fileURLToPath(new URL('rules', import.meta.url));
 
-const fixtures = fs
-  .readdirSync(rulesDir, {recursive: true})
+const fixtures = (fs.readdirSync(rulesDir, {recursive: true}) as string[])
   .filter(name => name.endsWith('.md'))
   .sort()
   .map(relativePath => {
@@ -47,14 +48,17 @@ const fixtures = fs
 // (no-with, no-octal, no-dupe-args) can only trigger in the sloppy
 // mode of a .cjs fixture, which a forced 'module' would make a parse
 // error instead of a lint report.
-const jsxScaffold = {
+const jsxScaffold: Linter.Config = {
   languageOptions: {parserOptions: {ecmaFeatures: {jsx: true}}},
 };
 
-const eslintByExport = new Map();
-function eslintFor(exportName) {
+const eslintByExport = new Map<string, ESLint>();
+function eslintFor(exportName: string) {
   if (!eslintByExport.has(exportName)) {
-    const config = [jsxScaffold, ...EXPORTS[exportName]];
+    const config: Linter.Config[] = [
+      jsxScaffold,
+      ...EXPORTS[exportName as keyof typeof EXPORTS],
+    ];
     // This repo does not install jest itself, so the version is
     // pinned via settings (consumers with jest installed get
     // auto-detection).
@@ -66,14 +70,14 @@ function eslintFor(exportName) {
       new ESLint({overrideConfig: config, overrideConfigFile: true}),
     );
   }
-  return eslintByExport.get(exportName);
+  return eslintByExport.get(exportName) as ESLint;
 }
 
-async function messagesFor(fixture, code) {
+async function messagesFor(fixture: RuleDoc, code: string) {
   const [result] = await eslintFor(fixture.exportName).lintText(code, {
     filePath: fixture.fileName,
   });
-  return result.messages;
+  return result?.messages ?? [];
 }
 
 for (const fixture of fixtures) {
@@ -85,7 +89,7 @@ for (const fixture of fixtures) {
     continue;
   }
   test(name, async () => {
-    const bad = await messagesFor(fixture, fixture.bad);
+    const bad = await messagesFor(fixture, fixture.bad ?? '');
     assert.ok(
       !bad.some(message => message.fatal),
       `${fixture.ruleId}: Bad snippet has a fatal parse error: ${bad.find(message => message.fatal)?.message ?? ''}`,
@@ -94,7 +98,7 @@ for (const fixture of fixtures) {
       bad.some(message => message.ruleId === fixture.ruleId),
       `${fixture.ruleId}: Bad snippet did not trigger the rule (got: ${bad.map(message => message.ruleId).join(', ') || 'nothing'})`,
     );
-    const good = await messagesFor(fixture, fixture.good);
+    const good = await messagesFor(fixture, fixture.good ?? '');
     assert.ok(
       !good.some(message => message.fatal),
       `${fixture.ruleId}: Good snippet has a fatal parse error: ${good.find(message => message.fatal)?.message ?? ''}`,
@@ -108,7 +112,7 @@ for (const fixture of fixtures) {
 
 test('rule fixtures: one markdown file per enabled rule', async () => {
   const enabled = await loadEnabledRules();
-  const fixtureIds = new Set(fixtures.map(fixture => fixture.ruleId));
+  const fixtureIds = new Set<string>(fixtures.map(fixture => fixture.ruleId));
   const missing = [...enabled.keys()].filter(id => !fixtureIds.has(id));
   const stale = [...fixtureIds].filter(id => !enabled.has(id));
   assert.deepEqual(

@@ -7,7 +7,7 @@ import {jest, node, typescriptPendingIgnores} from '../dist/index.js';
 
 const linter = new Linter();
 
-function messages(code, config, filename) {
+function messages(code: string, config: Linter.Config[], filename: string) {
   return linter.verify(code, config, {filename});
 }
 

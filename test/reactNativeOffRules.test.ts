@@ -9,15 +9,15 @@ import reactNativePlugin from '../dist/react-native-plugin/index.js';
 // but are 'off' in the reactNative config export (matching Eciperay).
 // These tests exercise the rules directly through the plugin object.
 const linter = new Linter();
-const jsxLang = {
+const jsxLang: Linter.Config = {
   languageOptions: {
     parserOptions: {ecmaFeatures: {jsx: true}},
     sourceType: 'module',
   },
 };
 
-function ruleIds(code, ruleId, filename) {
-  const config = [
+function ruleIds(code: string, ruleId: string, filename: string) {
+  const config: Linter.Config[] = [
     jsxLang,
     {
       files: ['**/*.{js,jsx}'],
@@ -29,7 +29,7 @@ function ruleIds(code, ruleId, filename) {
 }
 
 test('vendored plugin exposes exactly the 7 upstream rules', () => {
-  assert.deepEqual(Object.keys(reactNativePlugin.rules).sort(), [
+  assert.deepEqual(Object.keys(reactNativePlugin.rules ?? {}).sort(), [
     'no-color-literals',
     'no-inline-styles',
     'no-raw-text',

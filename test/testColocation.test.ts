@@ -1,12 +1,12 @@
 import assert from 'node:assert/strict';
 import {test} from 'node:test';
 
-import {SOURCE, colocationMessages} from './testColocationHarness.mjs';
+import {SOURCE, colocationMessages} from './testColocationHarness.ts';
 
 // Integration tests for test-colocation/exact-base-name (issue #37):
 // the linted test file itself — exact names pass, wrong case,
 // re-splits, and orphans fail. Companion-scan tests (steps files,
-// snapshots, exemptions) live in testColocationScan.test.mjs.
+// snapshots, exemptions) live in testColocationScan.test.ts.
 
 test('test-colocation: exact-name colocated test passes', async () => {
   const messages = await colocationMessages(
@@ -30,7 +30,7 @@ test('test-colocation: wrong-case test base fails', async () => {
     ['bananaman.test.tsx'],
   );
   assert.equal(messages.length, 1);
-  assert.match(messages[0].message, /bananaman/u);
+  assert.match(messages[0]?.message ?? '', /bananaman/u);
 });
 
 test('test-colocation: hyphen/underscore re-split test base fails', async () => {

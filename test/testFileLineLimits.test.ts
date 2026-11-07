@@ -7,7 +7,7 @@ import {base} from '../dist/index.js';
 
 const linter = new Linter();
 
-function ruleIds(code, filename) {
+function ruleIds(code: string, filename: string) {
   const messages = linter.verify(code, [...base], {filename});
   return messages.map(m => m.ruleId);
 }

@@ -38,7 +38,7 @@ test('smoke: the list covers every export declared in package.json', () => {
 
 // Subpath modules default-export their config array; the root module
 // carries named exports only. Either way: a list of config arrays.
-async function loadConfigArrays(specifier) {
+async function loadConfigArrays(specifier: string) {
   const mod = await import(specifier);
   if (Array.isArray(mod.default)) return [mod.default];
   return Object.values(mod).filter(value => Array.isArray(value));
@@ -57,7 +57,9 @@ for (const [subpath, specifier] of Object.entries(EXPORTS)) {
       const results = await eslint.lintText('export const smoke = 1;\n', {
         filePath: 'smoke.js',
       });
-      const fatals = results[0].messages.filter(message => message.fatal);
+      const [firstResult] = results;
+      assert.ok(firstResult, `${subpath} produced no lint result`);
+      const fatals = firstResult.messages.filter(message => message.fatal);
       assert.deepEqual(
         fatals,
         [],

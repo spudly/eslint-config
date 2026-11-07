@@ -14,7 +14,13 @@ import {satisfies} from 'semver';
 // npm uses), so prereleases, partial bounds, and hyphen ranges all
 // behave exactly as npm would treat them.
 
-function readJson(relativePath) {
+type Manifest = {
+  dependencies?: Record<string, string>;
+  devDependencies?: Record<string, string>;
+};
+type Lockfile = {packages?: Record<string, {version?: string}>};
+
+function readJson(relativePath: string) {
   return JSON.parse(
     readFileSync(new URL(relativePath, import.meta.url), 'utf8'),
   );
@@ -44,14 +50,14 @@ test('semver range semantics used by the lockfile check', () => {
   assert.equal(satisfies('2.3.5', '1.2.3 - 2.3.4'), false);
 });
 
-function staleEntries(manifest, lockfile) {
+function staleEntries(manifest: Manifest, lockfile: Lockfile) {
   // Each section is checked separately: a package declared in both
   // must satisfy both specs, never just the later section's.
   const declarations = [
     ...Object.entries(manifest.dependencies ?? {}),
     ...Object.entries(manifest.devDependencies ?? {}),
   ];
-  const stale = [];
+  const stale: string[] = [];
   for (const [name, spec] of declarations) {
     const locked = lockfile.packages?.[`node_modules/${name}`]?.version;
     if (!locked) {
@@ -64,27 +70,33 @@ function staleEntries(manifest, lockfile) {
 }
 
 test('the checker reports missing and out-of-range locked entries', () => {
-  const manifest = {dependencies: {foo: '^1.0.0', bar: '^2.0.0'}};
-  const lockfile = {packages: {'node_modules/foo': {version: '1.0.0'}}};
+  const manifest: Manifest = {dependencies: {foo: '^1.0.0', bar: '^2.0.0'}};
+  const lockfile: Lockfile = {
+    packages: {'node_modules/foo': {version: '1.0.0'}},
+  };
   assert.deepEqual(staleEntries(manifest, lockfile), [
     'bar: spec "^2.0.0" has no locked entry',
   ]);
-  lockfile.packages['node_modules/bar'] = {version: '1.5.0'};
+  (lockfile.packages ??= {})['node_modules/bar'] = {version: '1.5.0'};
   assert.deepEqual(staleEntries(manifest, lockfile), [
     'bar: locked 1.5.0 does not satisfy "^2.0.0"',
   ]);
-  lockfile.packages['node_modules/bar'] = {version: '2.1.0'};
+  (lockfile.packages ??= {})['node_modules/bar'] = {version: '2.1.0'};
   assert.deepEqual(staleEntries(manifest, lockfile), []);
-  const devManifest = {devDependencies: {bar: '^2.0.0'}};
-  const devLockfile = {packages: {'node_modules/bar': {version: '1.5.0'}}};
+  const devManifest: Manifest = {devDependencies: {bar: '^2.0.0'}};
+  const devLockfile: Lockfile = {
+    packages: {'node_modules/bar': {version: '1.5.0'}},
+  };
   assert.deepEqual(staleEntries(devManifest, devLockfile), [
     'bar: locked 1.5.0 does not satisfy "^2.0.0"',
   ]);
-  const bothManifest = {
+  const bothManifest: Manifest = {
     dependencies: {bar: '^2.0.0'},
     devDependencies: {bar: '^1.0.0'},
   };
-  const bothLockfile = {packages: {'node_modules/bar': {version: '1.5.0'}}};
+  const bothLockfile: Lockfile = {
+    packages: {'node_modules/bar': {version: '1.5.0'}},
+  };
   assert.deepEqual(staleEntries(bothManifest, bothLockfile), [
     'bar: locked 1.5.0 does not satisfy "^2.0.0"',
   ]);

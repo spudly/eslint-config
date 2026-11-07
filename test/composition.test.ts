@@ -19,10 +19,14 @@ import reactPending from '../dist/react-pending.js';
 // changes on every weekly rule-currency edit and gets rubber-stamped,
 // while these assertions change only when the composition itself
 // changes. Rule presence per se is covered by the behavior fixtures
-// and by check-rules; base.test.mjs asserts the folded rule ids.
+// and by check-rules; base.test.ts asserts the folded rule ids.
 
-function pluginNamespaces(blocks) {
-  const namespaces = new Set();
+import type {Linter} from 'eslint';
+
+type ConfigBlock = Linter.Config;
+
+function pluginNamespaces(blocks: readonly ConfigBlock[]) {
+  const namespaces = new Set<string>();
   for (const block of blocks) {
     for (const name of Object.keys(block.plugins ?? {})) {
       namespaces.add(name);
@@ -31,7 +35,7 @@ function pluginNamespaces(blocks) {
   return namespaces;
 }
 
-function severityOf(entry) {
+function severityOf(entry: unknown) {
   const severity = Array.isArray(entry) ? entry[0] : entry;
   if (severity === 2 || severity === 'error') return 'error';
   if (severity === 1 || severity === 'warn') return 'warn';
@@ -40,8 +44,8 @@ function severityOf(entry) {
 
 // The severity an export ultimately gives a rule: later blocks win in
 // flat config, so scan in order and keep the last setting found.
-function effectiveSeverity(blocks, ruleId) {
-  let result;
+function effectiveSeverity(blocks: readonly ConfigBlock[], ruleId: string) {
+  let result: string | undefined;
   for (const block of blocks) {
     if (block.rules && ruleId in block.rules) {
       result = severityOf(block.rules[ruleId]);
@@ -50,7 +54,11 @@ function effectiveSeverity(blocks, ruleId) {
   return result;
 }
 
-function firstIndexWithSeverity(blocks, ruleId, severity) {
+function firstIndexWithSeverity(
+  blocks: readonly ConfigBlock[],
+  ruleId: string,
+  severity: string,
+) {
   return blocks.findIndex(
     block => severityOf(block.rules?.[ruleId]) === severity,
   );
@@ -76,7 +84,7 @@ test('composition: each export registers the plugins its rules need', () => {
     tailwind,
   };
   for (const [name, plugins] of Object.entries(expected)) {
-    const actual = pluginNamespaces(byName[name]);
+    const actual = pluginNamespaces(byName[name as keyof typeof byName]);
     for (const plugin of plugins) {
       assert.ok(actual.has(plugin), `${name} must register ${plugin}`);
     }
@@ -108,7 +116,7 @@ test('composition: pending split — react ships hooks only, @eslint-react stays
 test('composition: typescriptPendingIgnores is a single ignores-only block', () => {
   assert.equal(typescriptPendingIgnores.length, 1);
   const [block] = typescriptPendingIgnores;
-  assert.ok(Array.isArray(block.ignores) && block.ignores.length > 0);
+  assert.ok(block && Array.isArray(block.ignores) && block.ignores.length > 0);
   assert.ok(!('rules' in block), 'ignores-only: no rules');
   assert.ok(!('plugins' in block), 'ignores-only: no plugins');
 });

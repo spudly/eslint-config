@@ -57,7 +57,7 @@ try {
 }
 `;
 
-async function packAndInstall(scratch) {
+async function packAndInstall(scratch: string) {
   await run(
     'npm',
     ['pack', '--pack-destination', scratch, '--loglevel=error'],
@@ -83,7 +83,7 @@ async function packAndInstall(scratch) {
   return consumer;
 }
 
-async function installDeps(consumer, tarball) {
+async function installDeps(consumer: string, tarball: string) {
   await run(
     'npm',
     [
@@ -100,15 +100,15 @@ async function installDeps(consumer, tarball) {
   );
 }
 
-function outputLine(stdout, prefix) {
+function outputLine(stdout: string, prefix: string) {
   return stdout
     .split('\n')
-    .find(l => l.startsWith(prefix))
+    .find((l: string) => l.startsWith(prefix))
     ?.slice(prefix.length + 1);
 }
 
-function assertConsumerOutput(stdout) {
-  const line = prefix => outputLine(stdout, prefix);
+function assertConsumerOutput(stdout: string) {
+  const line = (prefix: string) => outputLine(stdout, prefix);
   assert.match(
     line('TS_VERSION') ?? '',
     /^7\./,
@@ -137,7 +137,7 @@ function assertConsumerOutput(stdout) {
 // because PENDING_LOADED appeared, the restore condition is met: fold
 // reactPending back into `react`, delete the pending export, and
 // update this expectation.
-function assertPendingTripwire(stdout) {
+function assertPendingTripwire(stdout: string) {
   assert.ok(
     stdout.includes('PENDING_BLOCKED'),
     `reactPending loaded under TypeScript 7 — restoration condition for issue #8 is met.\n${stdout}`,

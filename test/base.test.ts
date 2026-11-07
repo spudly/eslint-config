@@ -7,7 +7,7 @@ import {base} from '../dist/index.js';
 
 const linter = new Linter();
 
-function ruleIds(code, config, filename) {
+function ruleIds(code: string, config: Linter.Config[], filename: string) {
   const messages = linter.verify(code, config, {filename});
   return messages.map(m => m.ruleId);
 }
@@ -55,7 +55,7 @@ test('base: eslint-comments requires a reason on disables', () => {
 // present in base's blocks) and behaviorally (it fires on a fixture).
 
 function baseRuleIds() {
-  const ids = new Set();
+  const ids = new Set<string>();
   for (const block of base) {
     for (const id of Object.keys(block.rules ?? {})) ids.add(id);
   }
