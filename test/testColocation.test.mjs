@@ -137,6 +137,52 @@ test('test-colocation: helpers in a dedicated test/ folder are exempt', async ()
   assert.deepEqual(messages, []);
 });
 
+test('test-colocation: an orphan companion is reported once per directory, not once per source file', async () => {
+  const root = await mkdtemp(path.join(os.tmpdir(), 'test-colocation-'));
+  try {
+    await writeFile(path.join(root, 'Apple.tsx'), SOURCE);
+    await writeFile(path.join(root, 'BananaMan.tsx'), SOURCE);
+    await writeFile(path.join(root, 'Banana_Man.test.steps.md'), '# steps\n');
+    const eslint = new ESLint({
+      cwd: root,
+      overrideConfig: base,
+      overrideConfigFile: true,
+    });
+    const results = await eslint.lintFiles([
+      path.join(root, 'Apple.tsx'),
+      path.join(root, 'BananaMan.tsx'),
+    ]);
+    const messages = results.flatMap(result =>
+      result.messages.filter(message => message.ruleId === RULE),
+    );
+    assert.equal(messages.length, 1);
+  } finally {
+    await rm(root, {recursive: true, force: true});
+  }
+});
+
+test('test-colocation: a parent directory named test above the cwd does not exempt', async () => {
+  const root = await mkdtemp(path.join(os.tmpdir(), 'test-colocation-'));
+  try {
+    const project = path.join(root, 'test', 'proj');
+    await mkdir(project, {recursive: true});
+    await writeFile(path.join(project, 'BananaMan.tsx'), SOURCE);
+    await writeFile(path.join(project, 'bananaman.test.tsx'), SOURCE);
+    const eslint = new ESLint({
+      cwd: project,
+      overrideConfig: base,
+      overrideConfigFile: true,
+    });
+    const [result] = await eslint.lintFiles([
+      path.join(project, 'bananaman.test.tsx'),
+    ]);
+    const messages = result.messages.filter(message => message.ruleId === RULE);
+    assert.equal(messages.length, 1);
+  } finally {
+    await rm(root, {recursive: true, force: true});
+  }
+});
+
 test('test-colocation: non-test fixtures under __tests__/ are untouched', async () => {
   const messages = await lintTree(
     {'BananaMan.tsx': SOURCE, '__tests__/fixture.ts': SOURCE},

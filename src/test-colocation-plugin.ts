@@ -135,7 +135,11 @@ const testColocationPlugin: ESLint.Plugin = {
             const directory = path.dirname(filename);
             // Shared test helpers live in a dedicated `test/` folder by
             // design and are not colocated tests (Stephen, 2026-11-07).
-            if (directory.split(path.sep).includes('test')) return;
+            // Only path segments below the ESLint working directory
+            // count: a checkout that happens to sit under a parent
+            // directory named `test` must not disable the rule.
+            const relativeDirectory = path.relative(context.cwd, directory);
+            if (relativeDirectory.split(path.sep).includes('test')) return;
             const listing = readListing(directory);
             if (!listing) return;
             const sourceBases = new Set(
@@ -160,7 +164,14 @@ const testColocationPlugin: ESLint.Plugin = {
             if (sourceBaseOf(ownName) === null) return;
             // The linted file is a source file: enforce the companions
             // that are never linted themselves (manual test steps and
-            // snapshot images), plus any misnamed test companion.
+            // snapshot images), plus any misnamed test companion. One
+            // deterministic reporter per directory — the alphabetically
+            // first source file — so an orphan companion is reported
+            // once, not once per source file in the directory.
+            const [firstSource] = listing.files
+              .filter(file => sourceBaseOf(file) !== null)
+              .sort();
+            if (firstSource !== ownName) return;
             for (const file of listing.files) {
               if (file === ownName) continue;
               const base = companionBaseOf(file);
