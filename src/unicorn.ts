@@ -32,9 +32,15 @@ export const unicorn: Linter.Config[] = [
           cases: {camelCase: true, pascalCase: true},
           ignore: [
             /^react-native\.config\.(?:js|cjs)$/u,
-            // Jest-mandated directory names and the mcp-server package directory
+            // Jest-mandated directory names, the colocated snapshot
+            // directory (issue #37), and the mcp-server package directory
             // (unicorn >=66 also checks directory names against the cases).
-            /^(?:__tests__|__mocks__|mcp-server)$/u,
+            /^(?:__tests__|__mocks__|__snapshots__|mcp-server)$/u,
+            // Colocated test companions (issue #37): the sanctioned
+            // dotted infixes are part of the file's name, not a case
+            // violation — the base name's case is policed exactly by
+            // test-colocation/exact-base-name.
+            /^.+\.(?:test|test\.e2e|stories)\.[^.]+$/u,
           ],
         },
       ],

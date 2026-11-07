@@ -5,6 +5,7 @@ import type {Linter} from 'eslint';
 
 import coverageIgnore from './coverage-ignore.js';
 import importX from './import-x.js';
+import testColocation from './test-colocation.js';
 import unicorn from './unicorn.js';
 
 /**
@@ -377,6 +378,7 @@ export const base: Linter.Config[] = [
   ...commonjsOverrides,
   ...eslintComments,
   ...coverageIgnore,
+  ...testColocation,
   // --- 13. Prettier -- last, disables formatting conflicts ---
   prettier,
 ];

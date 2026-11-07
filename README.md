@@ -165,7 +165,7 @@ the two rules that are `off` by default (`sort-styles`,
 
 ## Custom rules
 
-One of Eciperay's hand-written rules lives in this package:
+Hand-written rules live in this package:
 
 - **`coverage-ignore/require-description`** (part of `base`, source
   `src/coverage-ignore-plugin.ts`) — ported faithfully from Eciperay's
@@ -175,6 +175,20 @@ One of Eciperay's hand-written rules lives in this package:
   glob, exactly as Eciperay's section 10 did. It carries its original
   Eciperay unit tests, ported to this package's harness, plus
   Linter-API tests through `base`.
+- **`test-colocation/exact-base-name`** (part of `base`, source
+  `src/test-colocation-plugin.ts`, at `warn`) — enforces the test-file
+  convention: a test file is colocated with the file it tests and
+  shares its exact base name, case unchanged, with no underscores or
+  hyphens added to split words. For `BananaMan.tsx` the sanctioned
+  companions are `BananaMan.test.tsx`, `BananaMan.test.e2e.tsx`,
+  `BananaMan.test.steps.md`, `BananaMan.stories.tsx`, and snapshot
+  files under a colocated `__snapshots__/` directory whose names
+  start with `BananaMan` (tool-appended suffixes are acceptable). The
+  rule only flags orphan or misnamed companions — it never requires a
+  source file to have a test — and files under a dedicated `test/`
+  folder (shared test helpers) are exempt. Because `.test.steps.md`
+  files and snapshot images are never linted, they are enforced from
+  a linted source sibling.
 
 The other rule — Eciperay's section 10a
 `no-classname-outside-components` — was ported here briefly and then
