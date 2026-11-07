@@ -95,7 +95,7 @@
     "prettier:check": "prettier --check .",
     "prettier:write": "prettier --write .",
     "test": "npm run build && tsx --test test/*.test.ts",
-    "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.test.json"
+    "typecheck": "tsc --noEmit -p tsconfig.json && npm run build && tsc --noEmit -p tsconfig.test.json"
   },
   "type": "module",
   "types": "./dist/index.d.ts",

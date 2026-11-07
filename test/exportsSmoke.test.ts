@@ -57,9 +57,9 @@ for (const [subpath, specifier] of Object.entries(EXPORTS)) {
       const results = await eslint.lintText('export const smoke = 1;\n', {
         filePath: 'smoke.js',
       });
-      const fatals = (results[0]?.messages ?? []).filter(
-        message => message.fatal,
-      );
+      const [firstResult] = results;
+      assert.ok(firstResult, `${subpath} produced no lint result`);
+      const fatals = firstResult.messages.filter(message => message.fatal);
       assert.deepEqual(
         fatals,
         [],
