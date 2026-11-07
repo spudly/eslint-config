@@ -14,7 +14,11 @@ import {base} from '../dist/index.js';
 export const RULE = 'test-colocation/exact-base-name';
 export const SOURCE = 'export const value = 1;\n';
 
-export async function colocationMessages(files, targets, cwdSubdir = '') {
+export async function colocationMessages(
+  files: Record<string, string>,
+  targets: string[],
+  cwdSubdir = '',
+) {
   const root = await mkdtemp(path.join(os.tmpdir(), 'test-colocation-'));
   try {
     for (const [relative, content] of Object.entries(files)) {

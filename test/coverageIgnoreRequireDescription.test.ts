@@ -10,15 +10,21 @@ import {base} from '../dist/index.js';
 // .test.ts, adapted to this package's node:test harness: the rule is
 // driven directly through its create() with a stub context, exactly as
 // in the original.
-const runRuleOnComments = comments => {
-  const reports = [];
-  const rule = coverageIgnorePlugin.rules['require-description'];
+type TestComment = {value: string; loc?: {start: {line: number}}};
+
+const runRuleOnComments = (comments: TestComment[]) => {
+  const reports: {messageId: string | undefined}[] = [];
+  const rule = coverageIgnorePlugin.rules?.['require-description'];
+  if (!rule) throw new Error('coverage-ignore rule missing');
   const listeners = rule.create({
-    report: descriptor => {
+    report: (descriptor: {messageId?: string}) => {
       reports.push({messageId: descriptor.messageId});
     },
-  });
-  listeners.Program({
+  } as never);
+  const program = listeners.Program as unknown as (node: {
+    comments: unknown[];
+  }) => void;
+  program({
     comments: comments.map(comment => {
       if (comment.loc) {
         return comment;
@@ -61,7 +67,7 @@ test('coverage-ignore (ported): skips comments without a source location', () =>
 // folded into (Stephen, 2026-10-24 — no longer a standalone export).
 const linter = new Linter();
 
-function ruleIds(code, filename = 'x.js') {
+function ruleIds(code: string, filename = 'x.js') {
   return linter.verify(code, [...base], {filename}).map(m => m.ruleId);
 }
 

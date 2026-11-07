@@ -17,7 +17,7 @@ that follows them, and do not suggest patterns that contradict them.
   hold lasts, it must not be re-exported from `src/index.ts` or folded
   into `react`. The one exception is the documented restoration: once a
   TypeScript 7-compatible `@eslint-react` release is proven by the TS7
-  consumer fixture (`test/ts7Consumer.test.mjs`), folding it into
+  consumer fixture (`test/ts7Consumer.test.ts`), folding it into
   `react` and deleting the `./react-pending` subpath export is the
   planned restoration, not a violation (see the restore path in
   `src/react-pending.ts`).

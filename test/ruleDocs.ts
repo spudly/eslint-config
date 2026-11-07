@@ -41,11 +41,11 @@
 const SECTION_ORDER = ['Rule Description', 'Configuration', 'Test setup'];
 const FENCE = /^```(\w*)$/;
 
-function fail(fileLabel, message) {
+function fail(fileLabel: string, message: string): never {
   throw new Error(`${fileLabel}: ${message}`);
 }
 
-function extractFence(fileLabel, sectionName, lines) {
+function extractFence(fileLabel: string, sectionName: string, lines: string[]) {
   const open = lines.findIndex(line => FENCE.test(line.trim()));
   if (open === -1) {
     fail(fileLabel, `section "${sectionName}" has no code fence`);
@@ -62,23 +62,23 @@ function extractFence(fileLabel, sectionName, lines) {
     .trim();
 }
 
-function sectionText(lines) {
+function sectionText(lines: string[]) {
   return lines.join('\n').trim();
 }
 
-function readSections(lines, fileLabel) {
-  const sections = new Map();
-  let current = null;
+function readSections(lines: string[], fileLabel: string) {
+  const sections = new Map<string, string[]>();
+  let current: string | null = null;
   for (const line of lines) {
     const heading = /^## (.+)$/.exec(line);
     if (heading) {
-      current = heading[1].trim();
+      current = (heading[1] ?? '').trim();
       if (sections.has(current)) {
         fail(fileLabel, `duplicate section "${current}"`);
       }
       sections.set(current, []);
     } else if (current !== null) {
-      sections.get(current).push(line);
+      sections.get(current)?.push(line);
     }
   }
   for (const name of SECTION_ORDER) {
@@ -89,24 +89,45 @@ function readSections(lines, fileLabel) {
   return sections;
 }
 
-function parseTestSetup(lines, fileLabel) {
-  const setup = new Map();
+function parseTestSetup(lines: string[], fileLabel: string) {
+  const setup = new Map<string, string>();
   for (const line of lines) {
     const entry = /^- (Export|File): (.+)$/.exec(line.trim());
-    if (entry) setup.set(entry[1], entry[2].trim());
+    if (entry?.[1] && entry[2]) setup.set(entry[1], entry[2].trim());
   }
   if (!setup.has('Export') || !setup.has('File')) {
     fail(fileLabel, 'Test setup needs "- Export: ..." and "- File: ..."');
   }
-  return {exportName: setup.get('Export'), fileName: setup.get('File')};
+  return {
+    exportName: setup.get('Export') as string,
+    fileName: setup.get('File') as string,
+  };
 }
 
-function finishDoc(sections, fileLabel, base) {
+type RuleDocBase = {
+  ruleId: string;
+  description: string;
+  fileLabel: string;
+  exportName: string;
+  fileName: string;
+};
+
+export type RuleDoc = RuleDocBase & {
+  notTestable?: string;
+  bad?: string;
+  good?: string;
+};
+
+function finishDoc(
+  sections: Map<string, string[]>,
+  fileLabel: string,
+  base: RuleDocBase,
+): RuleDoc {
   if (sections.has('Not snippet-testable')) {
     if (sections.has('Bad') || sections.has('Good')) {
       fail(fileLabel, 'has both "Not snippet-testable" and Bad/Good');
     }
-    const rationale = sectionText(sections.get('Not snippet-testable'));
+    const rationale = sectionText(sections.get('Not snippet-testable') ?? []);
     if (rationale === '') {
       fail(fileLabel, 'section "Not snippet-testable" is empty');
     }
@@ -115,31 +136,31 @@ function finishDoc(sections, fileLabel, base) {
   if (!sections.has('Bad') || !sections.has('Good')) {
     fail(fileLabel, 'missing "Bad"/"Good" (or "Not snippet-testable")');
   }
-  const bad = extractFence(fileLabel, 'Bad', sections.get('Bad'));
-  const good = extractFence(fileLabel, 'Good', sections.get('Good'));
+  const bad = extractFence(fileLabel, 'Bad', sections.get('Bad') ?? []);
+  const good = extractFence(fileLabel, 'Good', sections.get('Good') ?? []);
   if (bad === '' || good === '') {
     fail(fileLabel, 'Bad and Good snippets must not be empty');
   }
   return {...base, bad, good};
 }
 
-export function parseRuleDoc(source, fileLabel) {
+export function parseRuleDoc(source: string, fileLabel: string): RuleDoc {
   const lines = source.split('\n');
   const title = lines.find(line => line.trim() !== '');
   const titleMatch = /^# Rule: (\S+)$/.exec(title?.trim() ?? '');
   if (!titleMatch) {
     fail(fileLabel, 'first line must be "# Rule: <ruleId>"');
   }
-  const ruleId = titleMatch[1];
+  const ruleId = titleMatch[1] as string;
   const sections = readSections(lines.slice(1), fileLabel);
-  const description = sectionText(sections.get('Rule Description'));
+  const description = sectionText(sections.get('Rule Description') ?? []);
   if (description === '') {
     fail(fileLabel, 'section "Rule Description" is empty');
   }
   const configuration = extractFence(
     fileLabel,
     'Configuration',
-    sections.get('Configuration'),
+    sections.get('Configuration') ?? [],
   );
   if (!configuration.includes(ruleId)) {
     fail(fileLabel, 'Configuration block does not show the rule entry');
@@ -148,19 +169,19 @@ export function parseRuleDoc(source, fileLabel) {
     ruleId,
     description,
     fileLabel,
-    ...parseTestSetup(sections.get('Test setup'), fileLabel),
+    ...parseTestSetup(sections.get('Test setup') ?? [], fileLabel),
   };
   return finishDoc(sections, fileLabel, base);
 }
 
-export function ruleIdForPath(relativePath) {
+export function ruleIdForPath(relativePath: string) {
   // test/rules/core/<rule>.md -> <rule> (ESLint core rules);
   // test/rules/<plugin>/<rule>.md -> <plugin>/<rule>. A rule name
   // may itself contain a slash (n/prefer-promises/fs lives at
   // test/rules/n/prefer-promises/fs.md): the plugin is the first
   // segment and the rule is the rest.
   const parts = relativePath.split('/');
-  const file = parts.at(-1).replace(/\.md$/, '');
+  const file = (parts.at(-1) ?? '').replace(/\.md$/, '');
   if (parts.at(-2) === 'core') return file;
-  return `${parts[0]}/${[...parts.slice(1, -1), file].join('/')}`;
+  return `${parts[0] ?? ''}/${[...parts.slice(1, -1), file].join('/')}`;
 }

@@ -26,8 +26,8 @@ import reactPending from '../dist/react-pending.js';
 // a Jest-ecosystem convention, not one repo's layout.
 const ALLOWED_LITERAL_SEGMENTS = new Set(['__tests__']);
 
-function layoutSegments(pattern) {
-  const bad = [];
+function layoutSegments(pattern: string) {
+  const bad: string[] = [];
   for (const segment of pattern.split('/')) {
     if (segment === '' || segment === '**') continue;
     if (ALLOWED_LITERAL_SEGMENTS.has(segment)) continue;
@@ -53,12 +53,12 @@ const allExports = {
 };
 
 test('no export carries a directory-layout files/ignores glob', () => {
-  const violations = [];
+  const violations: string[] = [];
   for (const [name, blocks] of Object.entries(allExports)) {
     for (const block of blocks) {
-      for (const key of ['files', 'ignores']) {
+      for (const key of ['files', 'ignores'] as const) {
         for (const pattern of block[key] ?? []) {
-          for (const seg of layoutSegments(pattern)) {
+          for (const seg of layoutSegments(pattern as string)) {
             violations.push(`${name}: ${key} "${pattern}" (segment "${seg}")`);
           }
         }

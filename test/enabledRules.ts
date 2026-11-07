@@ -12,7 +12,7 @@
 // 'error' — as shipped, no consumer ever sees them fire, so they need
 // no fixture. If a future composition change makes them effective,
 // this enumeration starts counting them and the coverage test in
-// ruleFixtures.test.mjs demands their fixtures.
+// ruleFixtures.test.ts demands their fixtures.
 import {ESLint} from 'eslint';
 
 import {base, jest, node, react, reactNative, tailwind} from '../dist/index.js';
@@ -62,25 +62,28 @@ const PROBES = {
   reactPending: ['fixture.ts', 'fixture.tsx', 'fixture.jsx'],
 };
 
-function severityOf(value) {
+function severityOf(value: unknown) {
   const severity = Array.isArray(value) ? value[0] : value;
-  return {0: 'off', 1: 'warn', 2: 'error'}[severity] ?? severity;
+  const byNumber: Record<number, string> = {0: 'off', 1: 'warn', 2: 'error'};
+  return (
+    (typeof severity === 'number' ? byNumber[severity] : undefined) ?? severity
+  );
 }
 
 /** Map of ruleId -> Set of export names that enable it. */
 export async function loadEnabledRules() {
-  const enabled = new Map();
+  const enabled = new Map<string, Set<string>>();
   for (const [exportName, blocks] of Object.entries(EXPORTS)) {
     const eslint = new ESLint({
       overrideConfig: blocks,
       overrideConfigFile: true,
     });
-    for (const probe of PROBES[exportName]) {
+    for (const probe of PROBES[exportName as keyof typeof PROBES]) {
       const config = await eslint.calculateConfigForFile(probe);
       for (const [ruleId, value] of Object.entries(config?.rules ?? {})) {
         if (severityOf(value) === 'off') continue;
-        if (!enabled.has(ruleId)) enabled.set(ruleId, new Set());
-        enabled.get(ruleId).add(exportName);
+        if (!enabled.has(ruleId)) enabled.set(ruleId, new Set<string>());
+        enabled.get(ruleId)?.add(exportName);
       }
     }
   }

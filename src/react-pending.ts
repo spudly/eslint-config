@@ -26,7 +26,7 @@ import type {Linter} from 'eslint';
  * the package root (src/index.ts). Re-exporting it would re-poison
  * every root import under TS7 — the exact failure of issue #8 — so it
  * ships only as `@spudly/eslint-config/react-pending`.
- * test/ts7Consumer.test.mjs guards both halves: the composed exports
+ * test/ts7Consumer.test.ts guards both halves: the composed exports
  * must load under typescript@7, and this one must NOT (yet).
  *
  * RESTORE PATH: when an @eslint-react / eslint-plugin-react-x release

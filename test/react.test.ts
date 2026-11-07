@@ -14,14 +14,14 @@ import reactPending from '../dist/react-pending.js';
 const reactRestored = [...react, ...reactPending];
 
 const linter = new Linter();
-const jsxLang = {
+const jsxLang: Linter.Config = {
   languageOptions: {
     parserOptions: {ecmaFeatures: {jsx: true}},
     sourceType: 'module',
   },
 };
 
-function ruleIds(code, config, filename = 'Comp.jsx') {
+function ruleIds(code: string, config: Linter.Config[], filename = 'Comp.jsx') {
   return linter
     .verify(code, [jsxLang, ...config], {filename})
     .map(m => m.ruleId);
@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
   });
   const unused = msgs.filter(m => m.ruleId === 'react-native/no-unused-styles');
   assert.equal(unused.length, 1, JSON.stringify(msgs));
-  assert.match(unused[0].message, /styles\.unused/);
+  assert.match(unused[0]?.message ?? '', /styles\.unused/);
 });
 
 test('reactNative: no-unused-styles passes when all keys are used', () => {
