@@ -78,7 +78,7 @@ below).
 | Export                     | Subpath                               | Contents                                                                                                                                                                                                                                                                                                                                                                                                          | Source in Eciperay's config                             |
 | -------------------------- | ------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
 | `base`                     | `@spudly/eslint-config/base`          | Everything every repo shares: all 292 core ESLint rules explicitly configured; JS-file re-enables for rules superseded by @typescript-eslint; eslint-plugin-import-x and eslint-plugin-unicorn, every rule explicit; the `.cjs` CommonJS overrides; eslint-comments discipline (a reason is required on every inline disable); the `coverage-ignore/require-description` custom rule; eslint-config-prettier last | Sections 1, 1b, 3, 4, 4a, 10, 11, 12 (unicorn part), 13 |
-| `react`                    | `@spudly/eslint-config/react`         | eslint-plugin-react-hooks, every rule explicit: the classic rules at `error`, the react-hooks 7 additions held `off`. The `@eslint-react` rules moved to `reactPending` pending TS7 support (see below)                                                                                                                                                                                                           | Sections 5 (react part), 8c, 12 (react-hooks part)      |
+| `react`                    | `@spudly/eslint-config/react`         | eslint-plugin-react-hooks, every rule explicit: the classic rules at `error`, the react-hooks 7 additions held `off`; plus the ported `jsx-no-literals/no-literals` rule at `warn` (no hard-coded user-facing strings, issue #42). The `@eslint-react` rules moved to `reactPending` pending TS7 support (see below)                                                                                              | Sections 5 (react part), 8c, 12 (react-hooks part)      |
 | `reactPending`             | `@spudly/eslint-config/react-pending` | The full `@eslint-react` rule set, every rule explicit, preserved verbatim — **pending, composed nowhere yet**: @eslint-react's plugin chain crashes on load under TypeScript 7 (issue #8). **Subpath-only**, deliberately not exported from the package root, so root imports stay TS7-safe (see below)                                                                                                          | Sections 5 (react part), 8c                             |
 | `reactNative`              | `@spudly/eslint-config/react-native`  | The 7 react-native rules, **vendored** (see below): 5 on, 2 off, matching Eciperay severities                                                                                                                                                                                                                                                                                                                     | Section 5 (react-native part)                           |
 | `node`                     | `@spudly/eslint-config/node`          | eslint-plugin-n for server code, every rule explicit, plus the Oct 2026 additions held `off`. **Rules only — no `files:` globs**; the consuming repo attaches its own server paths (see Usage)                                                                                                                                                                                                                    | Sections 6, 12 (n part)                                 |
@@ -189,6 +189,29 @@ Hand-written rules live in this package:
   folder (shared test helpers) are exempt. Because `.test.steps.md`
   files and snapshot images are never linted, they are enforced from
   a linted source sibling.
+- **`jsx-no-literals/no-literals`** (part of `react`, source
+  `src/jsx-no-literals-plugin.ts`, at `warn`) — bans hard-coded
+  user-facing string literals in JSX so copy flows through each
+  app's i18n voice/catalog machinery (issue #42). It is a TypeScript
+  port of upstream `react/jsx-no-literals` from eslint-plugin-react
+  7.37.5 (see NOTICE) — upstream cannot be installed under ESLint 10
+  and `@eslint-react` has no equivalent rule. The shipped
+  configuration is `noStrings: true` with
+  `restrictedAttributes: ['aria-label', 'alt', 'placeholder', 'title']`:
+  string literals are flagged as JSX children (including `{'…'}` and
+  template-literal children) and as values of those four user-facing
+  props (including template-literal values), while literals in other
+  attributes (`type="button"`, `href`, ids) pass, and literals with
+  no letters or numbers (punctuation, symbols, whitespace) are
+  allowed. Upstream option names are preserved (`noStrings`,
+  `allowedStrings`, `ignoreProps`, `noAttributeStrings`,
+  `restrictedAttributes`, `elementOverrides`), so consumers can tune
+  the rule per element or allowlist specific strings. Per the
+  severity policy the rule starts at `warn` and promotes to `error`
+  on/after 2026-12-07. Consumption patterns: the design system
+  composes `react` across `src/` and exempts Storybook fixtures
+  through its own `ignores`; the apps compose `react` on their UI
+  code — the scoping lives with the consumer, not in this package.
 
 The other rule — Eciperay's section 10a
 `no-classname-outside-components` — was ported here briefly and then

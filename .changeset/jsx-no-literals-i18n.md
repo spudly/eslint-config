@@ -1,0 +1,5 @@
+---
+'@spudly/eslint-config': minor
+---
+
+Enforce no hard-coded user-facing strings for the i18n program: the new `jsx-no-literals/no-literals` rule (in `react`, at `warn` per the severity policy) flags string literals used as JSX children and string literals in the user-facing props `aria-label`, `alt`, `placeholder`, and `title` — including template-literal values in those props — so copy flows through each app's voice/catalog machinery. Literals containing no letters or numbers (punctuation, symbols, whitespace) are allowed, and literals in other attributes (`type`, `href`, ids) are not flagged. The rule is a local port of upstream `react/jsx-no-literals` (eslint-plugin-react cannot be installed under ESLint 10) with upstream option names preserved (`noStrings`, `allowedStrings`, `ignoreProps`, `noAttributeStrings`, `restrictedAttributes`, `elementOverrides`).

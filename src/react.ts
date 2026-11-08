@@ -1,6 +1,8 @@
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import type {ESLint, Linter} from 'eslint';
 
+import {jsxNoLiterals} from './jsx-no-literals.js';
+
 // eslint-plugin-react-hooks' own plugin type conflicts with ESLint's
 // Plugin type on its legacy `configs.flat` shape; the runtime object is
 // a valid flat-config plugin, so it is cast here.
@@ -38,6 +40,11 @@ const reactHooks = reactHooksPlugin as unknown as ESLint.Plugin;
  * decision, not undecided — enabling both namespaces would
  * double-report the same patterns. The remaining react-hooks 7
  * additions are still 'off', awaiting individual evaluation.
+ *
+ * The final block is the ported jsx-no-literals rule (issue #42),
+ * folded in from src/jsx-no-literals.ts: it is a local plugin with no
+ * dependency chain, so it loads under TypeScript 7 today, unlike the
+ * pending @eslint-react set.
  */
 export const react: Linter.Config[] = [
   {
@@ -85,6 +92,11 @@ export const react: Linter.Config[] = [
       'react-hooks/fbt': 'off',
     },
   },
+  // ─── jsx-no-literals (issue #42) — ported local plugin, folded in ──
+  // Bans hard-coded user-facing strings in JSX (children and the
+  // restricted attributes) at 'warn' per the severity policy; see
+  // src/jsx-no-literals.ts for the configuration rationale.
+  ...jsxNoLiterals,
 ];
 
 export default react;
