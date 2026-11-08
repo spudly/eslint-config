@@ -69,7 +69,7 @@ test('composition: each export registers the plugins its rules need', () => {
     base: ['coverage-ignore', 'eslint-comments', 'import-x', 'unicorn'],
     jest: ['jest'],
     node: ['n'],
-    react: ['react-hooks'],
+    react: ['jsx-no-literals', 'react-hooks'],
     reactNative: ['react-native'],
     reactPending: ['@eslint-react'],
     tailwind: ['better-tailwindcss'],
