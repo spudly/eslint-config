@@ -1,3 +1,4 @@
+---
 '@spudly/eslint-config': minor
 ---
 

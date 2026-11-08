@@ -127,6 +127,53 @@ test('jsx-no-literals (in react): template-literal value in a non-restricted att
   );
 });
 
+test('jsx-no-literals (in react): expression-container attribute literals follow restrictedAttributes', () => {
+  // Same gating as direct attribute literals: type={'button'} is
+  // non-copy machinery and passes; title={'Details'} is a restricted
+  // user-facing prop and is flagged.
+  assert.ok(
+    !ruleIds(
+      'export const C = () => <button type={"button"} />;\n',
+      react,
+    ).includes('jsx-no-literals/no-literals'),
+  );
+  assert.ok(
+    ruleIds(
+      'export const C = () => <div title={"Details"} />;\n',
+      react,
+    ).includes('jsx-no-literals/no-literals'),
+  );
+});
+
+test('jsx-no-literals (in react): copy-free template interpolations pass, hard-coded template strings are flagged', () => {
+  assert.ok(
+    !ruleIds(
+      'export const C = ({count, total}) => <div>{`${count}/${total}`}</div>;\n',
+      react,
+    ).includes('jsx-no-literals/no-literals'),
+  );
+  assert.ok(
+    !ruleIds(
+      'export const C = ({name}) => <div>{`${name}`}</div>;\n',
+      react,
+    ).includes('jsx-no-literals/no-literals'),
+  );
+  // A template whose quasis carry copy is hard-coded text.
+  assert.ok(
+    ruleIds(
+      'export const C = ({count}) => <div>{`${count} items`}</div>;\n',
+      react,
+    ).includes('jsx-no-literals/no-literals'),
+  );
+  // A string literal with copy inside a template expression is too.
+  assert.ok(
+    ruleIds(
+      "export const C = () => <div>{`${'Hello'}`}</div>;\n",
+      react,
+    ).includes('jsx-no-literals/no-literals'),
+  );
+});
+
 test('jsx-no-literals (in react): shipped severity is warn with the planned options', () => {
   const block = react.find(
     b => b.rules && 'jsx-no-literals/no-literals' in b.rules,

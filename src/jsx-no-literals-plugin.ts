@@ -33,7 +33,19 @@
  *    already ignored upstream — punctuation-only, or symbols) is
  *    allowed: it is not user-facing copy. This is the issue's "narrow,
  *    explicit allowlist", implemented as one small tested helper
- *    rather than an ever-growing `allowedStrings` list.
+ *    rather than an ever-growing `allowedStrings` list. The same
+ *    allowance covers a template literal whose quasis carry no
+ *    letters or numbers (e.g. `` `${count}/${total}` `` interpolates
+ *    values, it does not hard-code copy); a string literal with copy
+ *    inside a template expression is still reported.
+ *
+ * One consistency fix over upstream, in the same spirit as
+ * adaptation 1: a string literal in an expression container that is
+ * an attribute value (`title={'…'}`) follows the same
+ * `restrictedAttributes` gating as a direct attribute literal —
+ * upstream reports it for every attribute under `noStrings`, which
+ * would ban `type={'button'}` despite the shipped configuration
+ * documenting non-restricted attributes as unflagged.
  */
 import type {Rule} from 'eslint';
 
@@ -421,6 +433,29 @@ const jsxNoLiteralsRule: Rule.RuleModule = {
         : 'literalNotInJSXExpression';
     }
 
+    /**
+     * True when a template literal hard-codes copy: any quasi with
+     * letters or numbers, or a string literal with letters or numbers
+     * directly inside one of its expressions (checked recursively
+     * for nested templates).
+     */
+    function templateHasCopy(node: AstNode): boolean {
+      const quasisHaveCopy = node.quasis.some(
+        (quasi: AstNode) =>
+          typeof quasi.value.cooked === 'string' &&
+          hasLettersOrNumbers(quasi.value.cooked),
+      );
+      if (quasisHaveCopy) return true;
+      return node.expressions.some(
+        (expression: AstNode) =>
+          (expression.type === 'Literal' &&
+            typeof expression.value === 'string' &&
+            hasLettersOrNumbers(expression.value)) ||
+          (expression.type === 'TemplateLiteral' &&
+            templateHasCopy(expression)),
+      );
+    }
+
     function reportLiteralNode(
       node: AstNode,
       messageId: string,
@@ -448,6 +483,27 @@ const jsxNoLiteralsRule: Rule.RuleModule = {
         }
 
         if (isViableTextNode(node, resolvedConfig)) {
+          // Adaptation 1, expression-container form: a literal that
+          // is an attribute value via {'…'} is gated by the same
+          // restrictedAttributes set as a direct attribute literal.
+          if (resolvedConfig.restrictedAttributes.size > 0) {
+            const {parent, grandParent} = getParentAndGrandParent(node);
+            if (
+              parent.type === 'JSXExpressionContainer' &&
+              grandParent.type === 'JSXAttribute'
+            ) {
+              const attributeName =
+                grandParent.name.type === 'JSXIdentifier'
+                  ? grandParent.name.name
+                  : undefined;
+              if (
+                !attributeName ||
+                !resolvedConfig.restrictedAttributes.has(attributeName)
+              ) {
+                return;
+              }
+            }
+          }
           if (hasJSXParentOrGrandParent || !config.ignoreProps) {
             reportLiteralNode(
               node,
@@ -534,6 +590,13 @@ const jsxNoLiteralsRule: Rule.RuleModule = {
 
         if (isParentJSXExpressionContainer) {
           const resolvedConfig = getOverrideConfig(node) || config;
+
+          // Adaptation 2: a template whose quasis carry no copy and
+          // whose expressions hold no string literal with copy is an
+          // interpolation, not hard-coded text.
+          if (!templateHasCopy(node)) {
+            return;
+          }
 
           // Adaptation 1: a template literal in an attribute value is
           // reported only for a restricted attribute when the option
