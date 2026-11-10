@@ -102,7 +102,7 @@
     "clean": "rm -rf dist",
     "check-rules": "npm run build && node scripts/checkRules.mjs",
     "lint": "eslint .",
-    "prepare": "husky",
+    "prepare": "husky || true",
     "prepublishOnly": "npm run build",
     "prettier:check": "prettier --check .",
     "prettier:write": "prettier --write .",
