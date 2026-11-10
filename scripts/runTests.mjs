@@ -19,6 +19,12 @@
  * CI environment variable is set (GitHub Actions sets it) the flag is
  * omitted and CI keeps its default parallelism.
  *
+ * Windows: `npm` is a .cmd shim there, which a shell-free spawnSync
+ * cannot execute, so the build step goes through the shell on win32
+ * (its arguments are fixed literals). tsx is invoked as its JavaScript
+ * entry point under the current node (process.execPath), which
+ * sidesteps the node_modules/.bin shim on every platform.
+ *
  * Exit codes propagate: a failed build or a failed test run exits
  * non-zero with the child's status.
  */
@@ -30,13 +36,13 @@ import {fileURLToPath} from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
-function run(command, args) {
-  const result = spawnSync(command, args, {cwd: root, stdio: 'inherit'});
+function run(command, args, {shell = false} = {}) {
+  const result = spawnSync(command, args, {cwd: root, stdio: 'inherit', shell});
   if (result.error) throw result.error;
   if (result.status !== 0) process.exit(result.status ?? 1);
 }
 
-run('npm', ['run', 'build']);
+run('npm', ['run', 'build'], {shell: process.platform === 'win32'});
 
 const testFiles = readdirSync(path.join(root, 'test'))
   .filter(name => name.endsWith('.test.ts'))
@@ -47,8 +53,8 @@ if (testFiles.length === 0) {
   process.exit(1);
 }
 
-const tsx = path.join(root, 'node_modules', '.bin', 'tsx');
-const args = ['--test'];
+const tsxCli = path.join(root, 'node_modules', 'tsx', 'dist', 'cli.mjs');
+const args = [tsxCli, '--test'];
 if (!process.env.CI) args.push('--test-concurrency=2');
 args.push(...testFiles);
-run(tsx, args);
+run(process.execPath, args);
