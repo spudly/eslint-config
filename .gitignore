@@ -2,3 +2,5 @@ node_modules/
 dist/
 *.tgz
 .tmp-*/
+.eslintcache
+*.tsbuildinfo
