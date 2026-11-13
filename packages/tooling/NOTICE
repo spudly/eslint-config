@@ -1,0 +1,6 @@
+# NOTICE
+
+`@spudly/tooling` contains no ported or vendored third-party code. It
+is original code written for the Spudly repos under the MIT License
+(see LICENSE). It invokes the external `actionlint` binary when one is
+installed; actionlint itself is not bundled.

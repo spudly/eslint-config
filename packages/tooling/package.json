@@ -1,0 +1,46 @@
+{
+  "author": "Stephen Sorensen",
+  "bin": {
+    "spudly-tooling": "./cli.ts"
+  },
+  "dependencies": {
+    "tsx": "^4.23.15"
+  },
+  "description": "Shared developer-tooling primitives and CLI for Spudly repos: affected-test discovery, the standard actionlint invocation, and a standards drift check for the common check contract.",
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "typescript": "^5.9.3"
+  },
+  "engines": {
+    "node": ">=20.19.0"
+  },
+  "exports": {
+    ".": {
+      "default": "./index.ts"
+    }
+  },
+  "files": [
+    "index.ts",
+    "cli.ts",
+    "LICENSE",
+    "NOTICE"
+  ],
+  "license": "MIT",
+  "main": "./index.ts",
+  "name": "@spudly/tooling",
+  "publishConfig": {
+    "access": "restricted",
+    "registry": "https://npm.pkg.github.com"
+  },
+  "repository": {
+    "directory": "packages/tooling",
+    "type": "git",
+    "url": "git+https://github.com/spudly/eslint-config.git"
+  },
+  "scripts": {
+    "test": "node scripts/runTests.mjs",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "type": "module",
+  "version": "0.1.0"
+}
