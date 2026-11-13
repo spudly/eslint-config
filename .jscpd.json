@@ -1,0 +1,12 @@
+{
+  "format": ["typescript", "tsx"],
+  "ignore": [
+    "**/dist/**",
+    "**/test/**",
+    "**/packages/eslint-config/src/react-native-plugin/**"
+  ],
+  "minLines": 5,
+  "minTokens": 50,
+  "path": ["packages/*/src"],
+  "reporters": ["console"]
+}
