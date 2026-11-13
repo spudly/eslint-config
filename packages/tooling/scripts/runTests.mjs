@@ -2,10 +2,10 @@
 /**
  * runTests — the `npm test` entry point.
  *
- * The package is TypeScript source with no build step (Stephen's
- * direction on PRs #51/#53): tsx runs the tests straight from
- * test/*.test.ts, and the package ships its TypeScript sources
- * (index.ts and the cli.ts bin, also run through tsx). The
+ * The package is TypeScript source (Stephen's direction on PRs
+ * #51/#53): tsx runs the tests straight from test/*.test.ts. The
+ * published package is tsc-built (prepack emits dist/), so only
+ * the tests run from source. The
  * test-file selection (top level
  * of test/, sorted) is reproduced with readdir so it is identical on
  * every platform.

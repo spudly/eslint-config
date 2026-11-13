@@ -1,4 +1,4 @@
-#!/usr/bin/env tsx
+#!/usr/bin/env node
 /**
  * spudly-tooling CLI (issue #49, tranche 3).
  *
@@ -22,7 +22,7 @@ import {
   actionlintInvocation,
   checkDriftForRepo,
   findAffectedTests,
-} from './index.ts';
+} from './index.js';
 
 function git(args: string[]): string[] {
   const result = spawnSync('git', args, {encoding: 'utf8'});
