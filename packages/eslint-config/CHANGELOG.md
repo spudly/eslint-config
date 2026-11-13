@@ -1,5 +1,14 @@
 # @spudly/eslint-config
 
+## 0.5.1
+
+### Patch Changes
+
+- 271dfbc: Move `@spudly/eslint-config` into `packages/eslint-config/` as this
+  repository becomes the shared tooling monorepo. No consumer-visible
+  change: the package name, version line, exports, and install contract
+  are unchanged, and consumers upgrade with no import changes.
+
 ## 0.5.0
 
 ### Minor Changes
