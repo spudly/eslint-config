@@ -90,6 +90,52 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
           exit 0
 
+  # jscpd copy-paste detection in WARN MODE (#48, Phase 1): findings are
+  # reported in the job summary, but the step always exits 0, this job is
+  # NOT in ci-gate's needs, and it is NOT a required status check —
+  # pre-existing duplication must never block a PR in this phase. Phase 3
+  # (enforce) sets a threshold in .jscpd.json and flips the always-zero
+  # exit once Stephen agrees the threshold.
+  # Scan scope (.jscpd.json): packages/eslint-config/src only, excluding the
+  # vendored packages/eslint-config/src/react-native-plugin/** —
+  # temporary vendored code with its own upstream, deleted wholesale
+  # when #5 lands; the pre-monorepo baseline run including it found
+  # all 4 clones (48 duplicated lines, 1.14%) inside it, and 0 clones
+  # on the scanned surface.
+  jscpd:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read # Required by actions/checkout
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+          registry-url: https://npm.pkg.github.com
+          scope: '@spudly'
+      - name: Enable Corepack (pinned npm)
+        run: corepack enable npm
+      - run: npm ci
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: jscpd (warn mode — never fails this phase)
+        run: |
+          set +e
+          npm run jscpd 2>&1 | tee jscpd-report.txt
+          code=${PIPESTATUS[0]}
+          {
+            echo "## jscpd baseline (warn mode, #48 Phase 1)"
+            echo ""
+            echo "Raw jscpd exit code: $code (findings are expected in Phase 1; this job never fails)."
+            echo ""
+            echo '```'
+            cat jscpd-report.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          exit 0
+
   # Always-reporting gate for branch protection: needs every job in
   # this workflow and reports whenever the workflow runs. It fails
   # only when a needed job failed or was cancelled, and passes when

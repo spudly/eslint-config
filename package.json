@@ -27,6 +27,7 @@
     "precommit:affected-tests": "tsx packages/tooling/cli.ts affected-tests --staged",
     "check-drift": "tsx packages/tooling/cli.ts check-drift",
     "lint:workflows": "tsx packages/tooling/cli.ts actionlint --staged",
+    "jscpd": "jscpd",
     "knip": "knip"
   },
   "lint-staged": {
@@ -48,6 +49,7 @@
     "eslint": "^10.12.0",
     "husky": "^9.1.7",
     "jiti": "^2.7.0",
+    "jscpd": "^5.4.3",
     "knip": "^6.45.1",
     "lint-staged": "^17.6.0",
     "prettier": "^3.9.10",
