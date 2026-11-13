@@ -29,7 +29,7 @@
  * non-zero with the child's status.
  */
 import {spawnSync} from 'node:child_process';
-import {readdirSync} from 'node:fs';
+import {existsSync, readdirSync} from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
 import {fileURLToPath} from 'node:url';
@@ -53,7 +53,22 @@ if (testFiles.length === 0) {
   process.exit(1);
 }
 
-const tsxCli = path.join(root, 'node_modules', 'tsx', 'dist', 'cli.mjs');
+// tsx is a devDependency of this package, but npm workspaces hoist it
+// to the monorepo root's node_modules, so walk up from this package
+// until a node_modules/tsx is found instead of assuming it is local.
+function findTsxCli(start) {
+  for (let dir = start; ; dir = path.dirname(dir)) {
+    const candidate = path.join(dir, 'node_modules', 'tsx', 'dist', 'cli.mjs');
+    if (existsSync(candidate)) return candidate;
+    if (path.dirname(dir) === dir) break;
+  }
+  throw new Error(
+    `runTests: could not locate tsx (node_modules/tsx/dist/cli.mjs) at or above ${
+      start
+    }`,
+  );
+}
+const tsxCli = findTsxCli(root);
 const args = [tsxCli, '--test'];
 if (!process.env.CI) args.push('--test-concurrency=2');
 args.push(...testFiles);

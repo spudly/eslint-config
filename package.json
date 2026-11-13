@@ -1,78 +1,30 @@
 {
+  "name": "spudly-tooling",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Shared developer-tooling monorepo for Spudly repos (eciperay, memorize, design-system, and this repo): @spudly/eslint-config, with @spudly/commitlint-config and @spudly/tooling added by later tranches of #49.",
+  "license": "MIT",
   "author": "Stephen Sorensen",
-  "dependencies": {
-    "@eslint-community/eslint-plugin-eslint-comments": "^4.8.1",
-    "@eslint-react/eslint-plugin": "^5.28.8",
-    "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-better-tailwindcss": "4.5.0",
-    "eslint-plugin-import-x": "^4.17.1",
-    "eslint-plugin-jest": "^29.17.0",
-    "eslint-plugin-n": "^18.4.1",
-    "eslint-plugin-react-hooks": "^7.1.1",
-    "eslint-plugin-unicorn": "^65.0.0",
-    "globals": "^17.13.0"
-  },
-  "description": "Shared ESLint 10 flat config for Spudly repos: Eciperay, Memorize, and the design system (@spudly/ui). Composable pieces ported from Eciperay's eslint.config.ts, with React rules on @eslint-react and vendored react-native rules.",
-  "devDependencies": {
-    "@changesets/cli": "^3.0.3",
-    "@types/node": "^24.0.0",
-    "@types/semver": "^7.8.0",
-    "eslint": "^10.12.0",
-    "husky": "^9.1.7",
-    "jiti": "^2.7.0",
-    "lint-staged": "^17.6.0",
-    "prettier": "^3.9.10",
-    "semver": "^7.8.6",
-    "tsx": "^4.23.15",
-    "typescript": "^5.9.3"
-  },
+  "type": "module",
+  "packageManager": "npm@10.9.4",
   "engines": {
     "node": ">=20.19.0"
   },
-  "exports": {
-    ".": {
-      "default": "./dist/index.js",
-      "types": "./dist/index.d.ts"
-    },
-    "./base": {
-      "default": "./dist/base.js",
-      "types": "./dist/base.d.ts"
-    },
-    "./jest": {
-      "default": "./dist/jest.js",
-      "types": "./dist/jest.d.ts"
-    },
-    "./node": {
-      "default": "./dist/node.js",
-      "types": "./dist/node.d.ts"
-    },
-    "./react": {
-      "default": "./dist/react.js",
-      "types": "./dist/react.d.ts"
-    },
-    "./react-pending": {
-      "default": "./dist/react-pending.js",
-      "types": "./dist/react-pending.d.ts"
-    },
-    "./react-native": {
-      "default": "./dist/react-native.js",
-      "types": "./dist/react-native.d.ts"
-    },
-    "./tailwind": {
-      "default": "./dist/tailwind.js",
-      "types": "./dist/tailwind.d.ts"
-    },
-    "./typescript": {
-      "default": "./dist/typescript.js",
-      "types": "./dist/typescript.d.ts"
-    }
-  },
-  "files": [
-    "dist",
-    "LICENSE",
-    "NOTICE"
+  "workspaces": [
+    "packages/*"
   ],
-  "license": "MIT",
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "changeset": "changeset",
+    "check-rules": "npm run check-rules --workspace=@spudly/eslint-config",
+    "clean": "npm run clean --workspaces --if-present",
+    "lint": "eslint .",
+    "prepare": "husky || true",
+    "prettier:check": "prettier --check .",
+    "prettier:write": "prettier --write .",
+    "test": "npm run test --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present"
+  },
   "lint-staged": {
     "*.{ts,tsx,js,cjs,mjs}": [
       "prettier --write",
@@ -82,34 +34,14 @@
       "prettier --write"
     ]
   },
-  "main": "./dist/index.js",
-  "name": "@spudly/eslint-config",
-  "packageManager": "npm@10.9.4",
-  "peerDependencies": {
-    "eslint": "^10.0.0"
-  },
-  "publishConfig": {
-    "access": "restricted",
-    "registry": "https://npm.pkg.github.com"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/spudly/eslint-config.git"
-  },
-  "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "changeset": "changeset",
-    "clean": "rm -rf dist",
-    "check-rules": "npm run build && node scripts/checkRules.mjs",
-    "lint": "eslint .",
-    "prepare": "husky || true",
-    "prepublishOnly": "npm run build",
-    "prettier:check": "prettier --check .",
-    "prettier:write": "prettier --write .",
-    "test": "node scripts/runTests.mjs",
-    "typecheck": "tsc --noEmit --incremental --tsBuildInfoFile .tsbuildinfo -p tsconfig.json && npm run build && tsc --noEmit --incremental --tsBuildInfoFile tsconfig.test.tsbuildinfo -p tsconfig.test.json"
-  },
-  "type": "module",
-  "types": "./dist/index.d.ts",
-  "version": "0.5.0"
+  "devDependencies": {
+    "@changesets/cli": "^3.0.3",
+    "@types/node": "^24.0.0",
+    "eslint": "^10.12.0",
+    "husky": "^9.1.7",
+    "jiti": "^2.7.0",
+    "lint-staged": "^17.6.0",
+    "prettier": "^3.9.10",
+    "typescript": "^5.9.3"
+  }
 }

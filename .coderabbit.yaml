@@ -8,7 +8,7 @@ reviews:
   auto_approvals:
     enabled: true
   path_instructions:
-    - path: 'src/**'
+    - path: 'packages/eslint-config/src/**'
       instructions: |
         This repo is @spudly/eslint-config, a shared ESLint 10 flat config
         consumed by the other Spudly repos. Review against these conventions:
@@ -35,16 +35,16 @@ reviews:
           another active export, because that re-breaks root imports under
           TypeScript 7. Exception: the documented restoration, once a
           TypeScript 7-compatible @eslint-react release is proven by the
-          TS7 consumer fixture (test/ts7Consumer.test.mjs), may fold it
+          TS7 consumer fixture (packages/eslint-config/test/ts7Consumer.test.mjs), may fold it
           into react.
         - Any new or modified rule intentionally set to 'off' must carry a
           rationale comment; flag unexplained 'off' entries in changed code.
           Deprecated/removed and new/missing
           rules are audited by `npm run check-rules`
-          (scripts/checkRules.mjs).
+          (packages/eslint-config/scripts/checkRules.mjs).
         - TypeScript style: use type aliases, never interfaces, outside
           vendored code under src/react-native-plugin/ (upstream-owned).
-    - path: 'src/react-pending.ts'
+    - path: 'packages/eslint-config/src/react-pending.ts'
       instructions: |
         This file preserves the @eslint-react rules in the reactPending
         export while @eslint-react lacks TypeScript 7 support. It is a
@@ -57,7 +57,7 @@ reviews:
         and the documented restoration into react once a TypeScript
         7-compatible @eslint-react release is proven by the TS7 consumer
         fixture.
-    - path: 'package.json'
+    - path: 'packages/eslint-config/package.json'
       instructions: |
         The exports map stays small: ., ./base, ./jest, ./node, ./react,
         ./react-pending, ./react-native, ./tailwind, ./typescript. Removing

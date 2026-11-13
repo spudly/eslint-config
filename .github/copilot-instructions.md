@@ -9,18 +9,18 @@ that follows them, and do not suggest patterns that contradict them.
 
 - The public export list stays small on purpose: `base`, `react`,
   `reactNative`, `jest`, `tailwind`, `typescriptPendingIgnores`, `node`
-  (see `src/index.ts`). Flag PRs that add new top-level exports for rule
+  (see `packages/eslint-config/src/index.ts`). Flag PRs that add new top-level exports for rule
   groups that belong inside `base` — import-x, unicorn, the CommonJS
   overrides, and the coverage-ignore rule already fold into `base`.
-- `reactPending` (`src/react-pending.ts`) exists only as the subpath
+- `reactPending` (`packages/eslint-config/src/react-pending.ts`) exists only as the subpath
   export `@spudly/eslint-config/react-pending`. While the TypeScript 7
-  hold lasts, it must not be re-exported from `src/index.ts` or folded
+  hold lasts, it must not be re-exported from `packages/eslint-config/src/index.ts` or folded
   into `react`. The one exception is the documented restoration: once a
   TypeScript 7-compatible `@eslint-react` release is proven by the TS7
-  consumer fixture (`test/ts7Consumer.test.ts`), folding it into
+  consumer fixture (`packages/eslint-config/test/ts7Consumer.test.ts`), folding it into
   `react` and deleting the `./react-pending` subpath export is the
   planned restoration, not a violation (see the restore path in
-  `src/react-pending.ts`).
+  `packages/eslint-config/src/react-pending.ts`).
 
 ## No path overrides in the shared config
 
@@ -41,7 +41,7 @@ that follows them, and do not suggest patterns that contradict them.
 - `typescript-eslint` and the `@eslint-react` chain are disabled because
   they do not support TypeScript 7 yet. Flag PRs that re-enable them in
   active exports before upstream TS7 support lands.
-- The `@eslint-react` rules are preserved in `src/react-pending.ts`.
+- The `@eslint-react` rules are preserved in `packages/eslint-config/src/react-pending.ts`.
   Flag any edit that alters the preserved rule set or moves those rules
   into `react` or another active export — with two exceptions:
   audit-driven currency updates from the check-rules script (removing
@@ -52,7 +52,7 @@ that follows them, and do not suggest patterns that contradict them.
 ## Rule currency
 
 - Deprecated/removed and new/missing rules are tracked by the
-  rule-currency audit (`scripts/checkRules.mjs`, run via
+  rule-currency audit (`packages/eslint-config/scripts/checkRules.mjs`, run via
   `npm run check-rules`). Any new or modified rule intentionally set to
   `'off'` must carry a rationale comment — flag unexplained `'off'`
   entries in changed code.
@@ -60,7 +60,7 @@ that follows them, and do not suggest patterns that contradict them.
 ## General
 
 - TypeScript: use type aliases, never `interface` — except in vendored
-  code under `src/react-native-plugin/`, which is upstream-owned.
+  code under `packages/eslint-config/src/react-native-plugin/`, which is upstream-owned.
 - `package-lock.json` is never hand-edited; it is regenerated with the
   pinned npm (`npm@10.9.4`, the `packageManager` field in
   `package.json`). Flag lockfile diffs that look hand-edited or are
