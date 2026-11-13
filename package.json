@@ -24,9 +24,9 @@
     "prettier:write": "prettier --write .",
     "test": "npm run test --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present",
-    "precommit:affected-tests": "node packages/tooling/cli.js affected-tests --staged",
-    "check-drift": "node packages/tooling/cli.js check-drift",
-    "lint:workflows": "node packages/tooling/cli.js actionlint --staged"
+    "precommit:affected-tests": "tsx packages/tooling/cli.ts affected-tests --staged",
+    "check-drift": "tsx packages/tooling/cli.ts check-drift",
+    "lint:workflows": "tsx packages/tooling/cli.ts actionlint --staged"
   },
   "lint-staged": {
     "*.{ts,tsx,js,cjs,mjs}": [
@@ -37,7 +37,7 @@
       "prettier --write"
     ],
     "*.{yml,yaml}": [
-      "node packages/tooling/cli.js actionlint"
+      "tsx packages/tooling/cli.ts actionlint"
     ]
   },
   "devDependencies": {

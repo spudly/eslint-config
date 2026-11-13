@@ -15,24 +15,31 @@ const TEST_FILE_PATTERN = /\.(?:test|spec)\.[^.]+$/;
 const WORKFLOW_PATTERN = /^\.github\/workflows\/[^/]+\.ya?ml$/;
 
 /** Scripts every consumer repo must expose under the common contract. */
-export const REQUIRED_SCRIPTS = ['precommit:affected-tests'];
+export const REQUIRED_SCRIPTS: string[] = ['precommit:affected-tests'];
 
 /** Hook stages every consumer repo must carry, by hook file name. */
-export const REQUIRED_HOOK_STAGES = {
+export const REQUIRED_HOOK_STAGES: Record<string, string[]> = {
   'commit-msg': ['commitlint'],
   'pre-commit': ['lint-staged'],
 };
 
-export function isTestFile(file) {
+export function isTestFile(file: string): boolean {
   return TEST_FILE_PATTERN.test(file);
 }
 
-export function isWorkflowFile(file) {
+export function isWorkflowFile(file: string): boolean {
   return WORKFLOW_PATTERN.test(file);
 }
 
+export type ActionlintInvocation = {
+  args: string[];
+  command: string;
+};
+
 /** The standard actionlint invocation for the given files, or null. */
-export function actionlintInvocation(files) {
+export function actionlintInvocation(
+  files: string[],
+): ActionlintInvocation | null {
   const workflows = files.filter(file => isWorkflowFile(file));
   if (workflows.length === 0) {
     return null;
@@ -45,9 +52,12 @@ export function actionlintInvocation(files) {
  * files (same directory, same base name, `*.test.*` / `*.spec.*`) that
  * exist in `existingFiles`. A changed test file affects itself.
  */
-export function findAffectedTests(changedFiles, existingFiles) {
+export function findAffectedTests(
+  changedFiles: string[],
+  existingFiles: string[],
+): string[] {
   const existing = new Set(existingFiles);
-  const affected = new Set();
+  const affected = new Set<string>();
   for (const file of changedFiles) {
     if (isTestFile(file)) {
       if (existing.has(file)) {
@@ -70,16 +80,26 @@ export function findAffectedTests(changedFiles, existingFiles) {
 }
 
 /** Workspace directories (`packages/<name>`) touched by the changes. */
-export function affectedWorkspaces(changedFiles) {
-  const workspaces = new Set();
+export function affectedWorkspaces(changedFiles: string[]): string[] {
+  const workspaces = new Set<string>();
   for (const file of changedFiles) {
     const match = /^(packages\/[^/]+)\//.exec(file);
-    if (match) {
+    if (match?.[1]) {
       workspaces.add(match[1]);
     }
   }
   return [...workspaces].sort();
 }
+
+export type DriftPackageJson = {
+  'lint-staged'?: Record<string, string[]>;
+  'scripts'?: Record<string, string>;
+};
+
+export type DriftInput = {
+  hooks?: Record<string, string | null | undefined>;
+  packageJson?: DriftPackageJson;
+};
 
 /**
  * Standards drift check over already-read repo state. Returns the list
@@ -87,8 +107,11 @@ export function affectedWorkspaces(changedFiles) {
  * required hook stages, and an actionlint stage in the lint-staged
  * configuration.
  */
-export function checkDrift({hooks = {}, packageJson = {}}) {
-  const missing = [];
+export function checkDrift({
+  hooks = {},
+  packageJson = {},
+}: DriftInput): string[] {
+  const missing: string[] = [];
   const scripts = packageJson.scripts ?? {};
   for (const script of REQUIRED_SCRIPTS) {
     if (!(script in scripts)) {
@@ -115,12 +138,14 @@ export function checkDrift({hooks = {}, packageJson = {}}) {
 }
 
 /** Read a repo from disk and run the drift check against it. */
-export function checkDriftForRepo(root) {
+export function checkDriftForRepo(root: string): string[] {
   const packageJsonPath = join(root, 'package.json');
-  const packageJson = existsSync(packageJsonPath)
-    ? JSON.parse(readFileSync(packageJsonPath, 'utf8'))
-    : {};
-  const hooks = {};
+  const packageJson = (
+    existsSync(packageJsonPath)
+      ? JSON.parse(readFileSync(packageJsonPath, 'utf8'))
+      : {}
+  ) as DriftPackageJson;
+  const hooks: Record<string, string | null> = {};
   for (const hook of Object.keys(REQUIRED_HOOK_STAGES)) {
     const hookPath = join(root, '.husky', hook);
     hooks[hook] = existsSync(hookPath) ? readFileSync(hookPath, 'utf8') : null;

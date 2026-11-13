@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env tsx
 /**
  * spudly-tooling CLI (issue #49, tranche 3).
  *
@@ -12,6 +12,9 @@
  *   missing optional binary.
  * - `check-drift [root]` — verify a repo carries the common check
  *   contract; exit 1 with the named missing pieces when it does not.
+ *
+ * Written in TypeScript and run through tsx (the package's bin entry),
+ * so there is no build step.
  */
 import {spawnSync} from 'node:child_process';
 
@@ -19,9 +22,9 @@ import {
   actionlintInvocation,
   checkDriftForRepo,
   findAffectedTests,
-} from './index.js';
+} from './index.ts';
 
-function git(args) {
+function git(args: string[]): string[] {
   const result = spawnSync('git', args, {encoding: 'utf8'});
   return result.status === 0 ? result.stdout.split('\n').filter(Boolean) : [];
 }
@@ -51,7 +54,9 @@ switch (command) {
       const result = spawnSync(invocation.command, invocation.args, {
         stdio: 'inherit',
       });
-      if (result.error?.code === 'ENOENT') {
+      const errorCode = (result.error as NodeJS.ErrnoException | undefined)
+        ?.code;
+      if (errorCode === 'ENOENT') {
         console.warn(
           'actionlint is not installed; skipping the workflow lint stage.',
         );

@@ -10,11 +10,11 @@ import {
   checkDrift,
   checkDriftForRepo,
   findAffectedTests,
-} from '../index.js';
+} from '../index.ts';
 
 const EXISTING = [
-  'packages/tooling/index.js',
-  'packages/tooling/test/tooling.test.mjs',
+  'packages/tooling/index.ts',
+  'packages/tooling/test/tooling.test.ts',
   'src/widget.ts',
   'src/widget.test.ts',
   'src/other.ts',
@@ -39,8 +39,8 @@ test('a file with no colocated test affects nothing', () => {
 test('affected workspaces are the touched package directories', () => {
   assert.deepEqual(
     affectedWorkspaces([
-      'packages/tooling/index.js',
-      'packages/tooling/cli.js',
+      'packages/tooling/index.ts',
+      'packages/tooling/cli.ts',
       'README.md',
     ]),
     ['packages/tooling'],
