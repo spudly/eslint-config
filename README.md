@@ -10,8 +10,11 @@ Packages.
 
 - [`@spudly/eslint-config`](packages/eslint-config/README.md) — the
   shared ESLint 10 flat config, in `packages/eslint-config/`.
-- `@spudly/commitlint-config` and `@spudly/tooling` arrive in later
-  tranches of #49.
+- [`@spudly/commitlint-config`](packages/commitlint-config/README.md) —
+  the shared commitlint base (wraps `@commitlint/config-conventional`),
+  in `packages/commitlint-config/`; this repo dogfoods it via
+  `commitlint.config.cjs` and the `.husky/commit-msg` hook.
+- `@spudly/tooling` arrives in a later tranche of #49.
 
 ## Working in this repo
 

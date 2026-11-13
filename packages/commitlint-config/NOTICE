@@ -1,0 +1,7 @@
+# NOTICE
+
+`@spudly/commitlint-config` contains no ported or vendored third-party
+code. It is original code written for the Spudly repos under the MIT
+License (see LICENSE). The conventional-commit rules come from
+`@commitlint/config-conventional`, which this package depends on and
+extends at runtime; that package is not bundled or copied here.
