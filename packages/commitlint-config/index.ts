@@ -12,9 +12,11 @@
  * those rules on top of this base in its own commitlint config — for
  * example eciperay's commit-scope rule. Nothing repo-specific belongs
  * here.
- *
- * @type {import('@commitlint/types').UserConfig}
  */
-export default {
+import type {UserConfig} from '@commitlint/types';
+
+const config: UserConfig = {
   extends: ['@commitlint/config-conventional'],
 };
+
+export default config;

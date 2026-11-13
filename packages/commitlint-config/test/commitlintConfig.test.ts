@@ -4,9 +4,9 @@ import test from 'node:test';
 import lint from '@commitlint/lint';
 import load from '@commitlint/load';
 
-import seed from '../index.js';
+import seed from '../index.ts';
 
-async function lintMessage(message) {
+async function lintMessage(message: string) {
   const loaded = await load(seed);
   return lint(message, loaded.rules, {
     parserOpts: loaded.parserPreset?.parserOpts ?? {},
