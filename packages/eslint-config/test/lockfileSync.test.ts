@@ -59,7 +59,13 @@ function staleEntries(manifest: Manifest, lockfile: Lockfile) {
   ];
   const stale: string[] = [];
   for (const [name, spec] of declarations) {
-    const locked = lockfile.packages?.[`node_modules/${name}`]?.version;
+    // npm workspaces hoist most packages to the root node_modules, but a
+    // conflicting version can be nested under this package instead, so
+    // either locked location satisfies the check.
+    const locked =
+      lockfile.packages?.[`node_modules/${name}`]?.version ??
+      lockfile.packages?.[`packages/eslint-config/node_modules/${name}`]
+        ?.version;
     if (!locked) {
       stale.push(`${name}: spec "${spec}" has no locked entry`);
     } else if (!satisfies(locked, spec)) {
@@ -104,6 +110,7 @@ test('the checker reports missing and out-of-range locked entries', () => {
 
 test('every direct dependency locked version satisfies its spec', () => {
   const manifest = readJson('../package.json');
-  const lockfile = readJson('../package-lock.json');
+  // The lockfile lives at the monorepo root, above this package.
+  const lockfile = readJson('../../../package-lock.json');
   assert.deepEqual(staleEntries(manifest, lockfile), []);
 });
