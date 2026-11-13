@@ -13,20 +13,21 @@
     "typescript": "^5.9.3"
   },
   "engines": {
-    "node": ">=20.19.0"
+    "node": ">=22.12.0"
   },
   "exports": {
     ".": {
-      "default": "./index.ts"
+      "default": "./dist/index.js",
+      "types": "./dist/index.d.ts"
     }
   },
   "files": [
-    "index.ts",
+    "dist",
     "LICENSE",
     "NOTICE"
   ],
   "license": "MIT",
-  "main": "./index.ts",
+  "main": "./dist/index.js",
   "name": "@spudly/commitlint-config",
   "publishConfig": {
     "access": "restricted",
@@ -38,6 +39,8 @@
     "url": "git+https://github.com/spudly/eslint-config.git"
   },
   "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "prepack": "npm run build",
     "test": "node scripts/runTests.mjs",
     "typecheck": "tsc --noEmit -p tsconfig.json"
   },
