@@ -37,45 +37,45 @@ const changedFiles =
       : [];
 
 switch (command) {
-case 'affected-tests': {
-  const existingFiles = git(['ls-files']);
-  for (const testFile of findAffectedTests(changedFiles, existingFiles)) {
-    console.log(testFile);
-  }
-
-break;
-}
-case 'actionlint': {
-  const invocation = actionlintInvocation(changedFiles);
-  if (invocation) {
-    const result = spawnSync(invocation.command, invocation.args, {
-      stdio: 'inherit',
-    });
-    if (result.error?.code === 'ENOENT') {
-      console.warn(
-        'actionlint is not installed; skipping the workflow lint stage.',
-      );
-    } else {
-      process.exit(result.status ?? 1);
+  case 'affected-tests': {
+    const existingFiles = git(['ls-files']);
+    for (const testFile of findAffectedTests(changedFiles, existingFiles)) {
+      console.log(testFile);
     }
-  }
 
-break;
-}
-case 'check-drift': {
-  const missing = checkDriftForRepo(files[0] ?? process.cwd());
-  if (missing.length > 0) {
-    console.error(`Standards drift: missing ${missing.join('; ')}.`);
-    process.exit(1);
+    break;
   }
-  console.log('No standards drift: the common check contract is present.');
+  case 'actionlint': {
+    const invocation = actionlintInvocation(changedFiles);
+    if (invocation) {
+      const result = spawnSync(invocation.command, invocation.args, {
+        stdio: 'inherit',
+      });
+      if (result.error?.code === 'ENOENT') {
+        console.warn(
+          'actionlint is not installed; skipping the workflow lint stage.',
+        );
+      } else {
+        process.exit(result.status ?? 1);
+      }
+    }
 
-break;
-}
-default: {
-  console.error(
-    'Usage: spudly-tooling <affected-tests|actionlint|check-drift> [--staged] [files...]',
-  );
-  process.exit(2);
-}
+    break;
+  }
+  case 'check-drift': {
+    const missing = checkDriftForRepo(files[0] ?? process.cwd());
+    if (missing.length > 0) {
+      console.error(`Standards drift: missing ${missing.join('; ')}.`);
+      process.exit(1);
+    }
+    console.log('No standards drift: the common check contract is present.');
+
+    break;
+  }
+  default: {
+    console.error(
+      'Usage: spudly-tooling <affected-tests|actionlint|check-drift> [--staged] [files...]',
+    );
+    process.exit(2);
+  }
 }
