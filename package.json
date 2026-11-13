@@ -2,7 +2,7 @@
   "name": "spudly-tooling",
   "version": "0.0.0",
   "private": true,
-  "description": "Shared developer-tooling monorepo for Spudly repos (eciperay, memorize, design-system, and this repo): @spudly/eslint-config, with @spudly/commitlint-config and @spudly/tooling added by later tranches of #49.",
+  "description": "Shared developer-tooling monorepo for Spudly repos (eciperay, memorize, design-system, and this repo): @spudly/eslint-config, @spudly/commitlint-config, and @spudly/tooling.",
   "license": "MIT",
   "author": "Stephen Sorensen",
   "type": "module",
@@ -23,7 +23,10 @@
     "prettier:check": "prettier --check .",
     "prettier:write": "prettier --write .",
     "test": "npm run test --workspaces --if-present",
-    "typecheck": "npm run typecheck --workspaces --if-present"
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "precommit:affected-tests": "node packages/tooling/cli.js affected-tests --staged",
+    "check-drift": "node packages/tooling/cli.js check-drift",
+    "lint:workflows": "node packages/tooling/cli.js actionlint --staged"
   },
   "lint-staged": {
     "*.{ts,tsx,js,cjs,mjs}": [
@@ -32,6 +35,9 @@
     ],
     "*.{json,md}": [
       "prettier --write"
+    ],
+    "*.{yml,yaml}": [
+      "node packages/tooling/cli.js actionlint"
     ]
   },
   "devDependencies": {

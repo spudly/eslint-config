@@ -27,6 +27,22 @@ export default [
   },
   {
     // Same directory-name problem as above, one package over:
+    // packages/tooling is JavaScript (not TypeScript, so its files
+    // are linted, unlike packages/eslint-config's), and its directory
+    // name is its npm package name.
+    files: ['packages/tooling/**/*.{js,mjs}'],
+    rules: {'unicorn/filename-case': 'off'},
+  },
+  {
+    // The tooling package is a Node CLI: `process` and console output
+    // are its interface, so the browser-oriented globals and the
+    // no-console rule do not apply to its executable files.
+    files: ['packages/tooling/cli.js'],
+    languageOptions: {globals: {console: 'readonly', process: 'readonly'}},
+    rules: {'no-console': 'off'},
+  },
+  {
+    // Same directory-name problem as above, one package over:
     // packages/commitlint-config is JavaScript (not TypeScript, so
     // its files are linted, unlike packages/eslint-config's), and its
     // directory name is its npm package name.
