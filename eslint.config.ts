@@ -25,4 +25,12 @@ export default [
     files: ['packages/*/scripts/**/*.mjs'],
     rules: {'unicorn/filename-case': 'off'},
   },
+  {
+    // Same directory-name problem as above, one package over:
+    // packages/commitlint-config is JavaScript (not TypeScript, so
+    // its files are linted, unlike packages/eslint-config's), and its
+    // directory name is its npm package name.
+    files: ['packages/commitlint-config/**/*.{js,mjs}'],
+    rules: {'unicorn/filename-case': 'off'},
+  },
 ];

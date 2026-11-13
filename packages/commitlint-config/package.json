@@ -1,0 +1,41 @@
+{
+  "author": "Stephen Sorensen",
+  "dependencies": {
+    "@commitlint/config-conventional": "^21.2.4"
+  },
+  "description": "Shared commitlint base config for Spudly repos: wraps @commitlint/config-conventional; consumers layer repo-specific rules (such as commit scopes) locally.",
+  "devDependencies": {
+    "@commitlint/lint": "^21.2.4",
+    "@commitlint/load": "^21.2.4"
+  },
+  "engines": {
+    "node": ">=20.19.0"
+  },
+  "exports": {
+    ".": {
+      "default": "./index.js"
+    }
+  },
+  "files": [
+    "index.js",
+    "LICENSE",
+    "NOTICE"
+  ],
+  "license": "MIT",
+  "main": "./index.js",
+  "name": "@spudly/commitlint-config",
+  "publishConfig": {
+    "access": "restricted",
+    "registry": "https://npm.pkg.github.com"
+  },
+  "repository": {
+    "directory": "packages/commitlint-config",
+    "type": "git",
+    "url": "git+https://github.com/spudly/eslint-config.git"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.mjs"
+  },
+  "type": "module",
+  "version": "0.1.0"
+}
