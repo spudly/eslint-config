@@ -1,0 +1,36 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "workspaces": {
+    ".": {
+      "entry": ["eslint.config.ts", "commitlint.config.cjs"],
+      "project": ["*.ts", "*.cjs"]
+    },
+    "packages/eslint-config": {
+      "entry": [
+        "src/index.ts",
+        "src/base.ts",
+        "src/jest.ts",
+        "src/node.ts",
+        "src/react.ts",
+        "src/react-pending.ts",
+        "src/react-native.ts",
+        "src/tailwind.ts",
+        "src/typescript.ts",
+        "scripts/*.mjs",
+        "test/*.test.ts"
+      ],
+      "ignore": ["src/react-native-plugin/util/variable.ts"],
+      "project": ["src/**", "test/**", "scripts/**"]
+    },
+    "packages/commitlint-config": {
+      "entry": ["index.ts", "scripts/*.mjs", "test/*.test.ts"],
+      "project": ["**/*.ts", "scripts/**"]
+    },
+    "packages/tooling": {
+      "entry": ["index.ts", "cli.ts", "scripts/*.mjs", "test/*.test.ts"],
+      "project": ["**/*.ts", "scripts/**"]
+    }
+  },
+  "ignoreDependencies": ["tsx"],
+  "ignoreExportsUsedInFile": true
+}

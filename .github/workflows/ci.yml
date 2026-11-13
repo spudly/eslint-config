@@ -50,6 +50,46 @@ jobs:
       - run: npm run lint
       - run: npm run prettier:check
 
+  # Knip dead-code detection in WARN MODE (#47, Phase 1): findings are
+  # reported as annotations and in the job summary, but the step always
+  # exits 0, this job is NOT in ci-gate's needs, and it is NOT a required
+  # status check — pre-existing dead code must never block a PR in this
+  # phase. Phase 3 (enforce) flips the always-zero exit once the
+  # baseline is burned down.
+  knip:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read # Required by actions/checkout
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+          registry-url: https://npm.pkg.github.com
+          scope: '@spudly'
+      - name: Enable Corepack (pinned npm)
+        run: corepack enable npm
+      - run: npm ci
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Knip (warn mode — never fails this phase)
+        run: |
+          set +e
+          npm run knip -- --reporter github-actions 2>&1 | tee knip-report.txt
+          code=${PIPESTATUS[0]}
+          {
+            echo "## Knip baseline (warn mode, #47 Phase 1)"
+            echo ""
+            echo "Raw knip exit code: $code (findings are expected in Phase 1; this job never fails)."
+            echo ""
+            echo '```'
+            cat knip-report.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          exit 0
+
   # Always-reporting gate for branch protection: needs every job in
   # this workflow and reports whenever the workflow runs. It fails
   # only when a needed job failed or was cancelled, and passes when
