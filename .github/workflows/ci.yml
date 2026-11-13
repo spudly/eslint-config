@@ -96,7 +96,7 @@ jobs:
   # pre-existing duplication must never block a PR in this phase. Phase 3
   # (enforce) sets a threshold in .jscpd.json and flips the always-zero
   # exit once Stephen agrees the threshold.
-  # Scan scope (.jscpd.json): packages/*/src only, excluding the
+  # Scan scope (.jscpd.json): packages/eslint-config/src only, excluding the
   # vendored packages/eslint-config/src/react-native-plugin/** —
   # temporary vendored code with its own upstream, deleted wholesale
   # when #5 lands; the pre-monorepo baseline run including it found

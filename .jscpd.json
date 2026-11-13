@@ -7,6 +7,6 @@
   ],
   "minLines": 5,
   "minTokens": 50,
-  "path": ["packages/*/src"],
+  "path": ["packages/eslint-config/src"],
   "reporters": ["console"]
 }
