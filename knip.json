@@ -11,6 +11,7 @@
         "src/base.ts",
         "src/jest.ts",
         "src/node.ts",
+        "src/no-page-styling.ts",
         "src/react.ts",
         "src/react-pending.ts",
         "src/react-native.ts",

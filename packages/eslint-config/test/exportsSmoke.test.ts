@@ -18,6 +18,7 @@ const EXPORTS = {
   './base': '../dist/base.js',
   './jest': '../dist/jest.js',
   './node': '../dist/node.js',
+  './no-page-styling': '../dist/no-page-styling.js',
   './react': '../dist/react.js',
   './react-pending': '../dist/react-pending.js',
   './react-native': '../dist/react-native.js',

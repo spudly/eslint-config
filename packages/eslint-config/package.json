@@ -43,6 +43,10 @@
       "default": "./dist/node.js",
       "types": "./dist/node.d.ts"
     },
+    "./no-page-styling": {
+      "default": "./dist/no-page-styling.js",
+      "types": "./dist/no-page-styling.d.ts"
+    },
     "./react": {
       "default": "./dist/react.js",
       "types": "./dist/react.d.ts"
