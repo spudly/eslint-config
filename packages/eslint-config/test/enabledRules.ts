@@ -15,13 +15,22 @@
 // ruleFixtures.test.ts demands their fixtures.
 import {ESLint} from 'eslint';
 
-import {base, jest, node, react, reactNative, tailwind} from '../dist/index.js';
+import {
+  base,
+  jest,
+  node,
+  noPageStyling,
+  react,
+  reactNative,
+  tailwind,
+} from '../dist/index.js';
 import reactPending from '../dist/react-pending.js';
 
 export const EXPORTS = {
   base,
   jest,
   node,
+  noPageStyling,
   react,
   reactNative,
   tailwind,
@@ -56,6 +65,10 @@ const PROBES = {
     '__tests__/fixture.jsx',
   ],
   node: ['fixture.js'],
+  // Rules-only export like `node`: as shipped it carries no `files:`
+  // globs, so only ESLint's default-matched extensions enumerate it;
+  // consumers attach their own page/view globs (see the README).
+  noPageStyling: ['fixture.js'],
   react: ['fixture.ts', 'fixture.tsx', 'fixture.jsx'],
   reactNative: ['fixture.ts', 'fixture.tsx', 'fixture.jsx'],
   tailwind: ['fixture.tsx', 'fixture.jsx'],

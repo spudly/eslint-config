@@ -16,6 +16,7 @@
  *   base,
  *   jest,
  *   node,
+ *   noPageStyling,
  *   react,
  *   reactNative,
  *   tailwind,
@@ -31,6 +32,12 @@
  *   ...node.map(block => ({
  *     ...block,
  *     files: ['packages/server/**', 'packages/mcp-server/**'],
+ *   })),
+ *   // `noPageStyling` carries no paths either: attach the
+ *   // directories whose files must not style directly.
+ *   ...noPageStyling.map(block => ({
+ *     ...block,
+ *     files: ['src/pages/**', 'src/views/**'],
  *   })),
  *   ...jest,
  *   ...tailwind,
@@ -52,6 +59,7 @@
 export {base} from './base.js';
 export {default as jest} from './jest.js';
 export {default as node} from './node.js';
+export {default as noPageStyling} from './no-page-styling.js';
 export {default as react} from './react.js';
 export {default as reactNative} from './react-native.js';
 export {default as tailwind} from './tailwind.js';

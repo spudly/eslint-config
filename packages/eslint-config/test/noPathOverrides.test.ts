@@ -5,6 +5,7 @@ import {
   base,
   jest,
   node,
+  noPageStyling,
   react,
   reactNative,
   tailwind,
@@ -45,6 +46,7 @@ const allExports = {
   base,
   jest,
   node,
+  noPageStyling,
   react,
   reactNative,
   reactPending,
@@ -73,6 +75,7 @@ test('the export surface is exactly the small list Stephen approved', async () =
   assert.deepEqual(Object.keys(index).sort(), [
     'base',
     'jest',
+    'noPageStyling',
     'node',
     'react',
     'reactNative',

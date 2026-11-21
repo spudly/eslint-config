@@ -5,6 +5,7 @@ import {
   base,
   jest,
   node,
+  noPageStyling,
   react,
   reactNative,
   tailwind,
@@ -69,6 +70,7 @@ test('composition: each export registers the plugins its rules need', () => {
     base: ['coverage-ignore', 'eslint-comments', 'import-x', 'unicorn'],
     jest: ['jest'],
     node: ['n'],
+    noPageStyling: ['no-page-styling'],
     react: ['jsx-no-literals', 'react-hooks'],
     reactNative: ['react-native'],
     reactPending: ['@eslint-react'],
@@ -78,6 +80,7 @@ test('composition: each export registers the plugins its rules need', () => {
     base,
     jest,
     node,
+    noPageStyling,
     react,
     reactNative,
     reactPending,
@@ -93,7 +96,13 @@ test('composition: each export registers the plugins its rules need', () => {
 
 test('composition: base does not absorb the opt-in or scoped groups', () => {
   const namespaces = pluginNamespaces(base);
-  for (const plugin of ['jest', 'n', 'react-hooks', 'react-native']) {
+  for (const plugin of [
+    'jest',
+    'n',
+    'no-page-styling',
+    'react-hooks',
+    'react-native',
+  ]) {
     assert.ok(!namespaces.has(plugin), `base must not register ${plugin}`);
   }
 });
