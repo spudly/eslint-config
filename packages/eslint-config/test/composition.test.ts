@@ -68,7 +68,7 @@ function firstIndexWithSeverity(
 test('composition: each export registers the plugins its rules need', () => {
   const expected = {
     base: ['coverage-ignore', 'eslint-comments', 'import-x', 'unicorn'],
-    jest: ['jest'],
+    jest: ['jest', 'no-source-reads-in-tests'],
     node: ['n'],
     noPageStyling: ['no-page-styling'],
     react: ['jsx-no-literals', 'react-hooks'],
