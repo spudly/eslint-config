@@ -90,7 +90,7 @@ below).
 | `reactNative`              | `@spudly/eslint-config/react-native`    | The 7 react-native rules, **vendored** (see below): 5 on, 2 off, matching Eciperay severities                                                                                                                                                                                                                                                                                                                     | Section 5 (react-native part)                             |
 | `node`                     | `@spudly/eslint-config/node`            | eslint-plugin-n for server code, every rule explicit, plus the Oct 2026 additions held `off`. **Rules only — no `files:` globs**; the consuming repo attaches its own server paths (see Usage)                                                                                                                                                                                                                    | Sections 6, 12 (n part)                                   |
 | `noPageStyling`            | `@spudly/eslint-config/no-page-styling` | The ported `no-page-styling/no-page-styling` rule at `warn` (no direct Tamagui imports, no `className`, no inline `style` in scoped files, issue #60). **Rules only — no `files:` globs**; the consuming repo attaches its own page/view or app paths (see Usage and Custom rules)                                                                                                                                | design-system `eslintRules/noPageStyling.mjs` (#119/#297) |
-| `jest`                     | `@spudly/eslint-config/jest`            | eslint-plugin-jest for test/setup files (with the core/unicorn relaxations Eciperay applies in test scope), every rule explicit, plus the Oct 2026 additions held `off`. Scoped by Jest naming conventions only (test/spec suffixes, `jest.setup*` filenames, `__tests__/`)                                                                                                                                       | Sections 7, 12 (jest part)                                |
+| `jest`                     | `@spudly/eslint-config/jest`            | eslint-plugin-jest for test/setup files (with the core/unicorn relaxations Eciperay applies in test scope), every rule explicit, plus the Oct 2026 additions held `off`, plus the ported `no-source-reads-in-tests/no-source-reads-in-tests` rule at `warn` (issue #59). Scoped by Jest naming conventions only (test/spec suffixes, `jest.setup*` filenames, `__tests__/`)                                       | Sections 7, 12 (jest part)                                |
 | `tailwind`                 | `@spudly/eslint-config/tailwind`        | eslint-plugin-better-tailwindcss (pinned 4.5.0, the version the source config was tuned against)                                                                                                                                                                                                                                                                                                                  | Sections 8, 8a                                            |
 | `typescriptPendingIgnores` | `@spudly/eslint-config/typescript`      | Global ignores for `*.ts`/`*.tsx`/`*.mts`/`*.cts` — the interim state while typescript-eslint lacks TS7 support (see below)                                                                                                                                                                                                                                                                                       | Top-of-file ignores block                                 |
 
@@ -242,6 +242,20 @@ Hand-written rules live in this package:
   on/after 2026-12-21. Like the DS-local copy, it is dormant on
   TS/TSX files until the TS lint restoration (issue #8) removes the
   `typescriptPendingIgnores` block.
+
+- **`no-source-reads-in-tests/no-source-reads-in-tests`** (part of
+  `jest`, source `src/no-source-reads-in-tests-plugin.ts`, at
+  `warn`) — test files must not read JS/TS source files
+  (design-system #733/#772; promoted here by issue #59 from the
+  design-system's local `eslintRules/noSourceReadsInTests.mjs`):
+  a filesystem read (`readFileSync`, `readFile`, `existsSync`,
+  `createReadStream`, `readdirSync`) whose target statically
+  resolves to a source file or a `src/` source directory is
+  flagged, including template/`join(...)` targets,
+  enumerate-then-read patterns, and local read-helper call sites.
+  Reads of data files (`.json`, `.md`, `.css`, `.html`,
+  `package.json`), declaration files (`.d.ts`), and built `dist/`
+  output are not flagged.
 
 The other rule — Eciperay's section 10a
 `no-classname-outside-components` — was ported here briefly and then

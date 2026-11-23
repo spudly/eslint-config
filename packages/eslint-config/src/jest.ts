@@ -1,6 +1,8 @@
 import jestPlugin from 'eslint-plugin-jest';
 import type {Linter} from 'eslint';
 
+import noSourceReadsInTestsPlugin from './no-source-reads-in-tests-plugin.js';
+
 /**
  * Jest rules for test files and setup files.
  *
@@ -29,7 +31,10 @@ export const jest: Linter.Config[] = [
       '**/jest.setupEnv.{ts,js}',
       '**/__tests__/**/*.{ts,tsx,js,jsx}', // shared fixtures
     ],
-    plugins: {jest: jestPlugin},
+    plugins: {
+      'jest': jestPlugin,
+      'no-source-reads-in-tests': noSourceReadsInTestsPlugin,
+    },
     languageOptions: {
       globals: {
         jest: 'readonly',
@@ -47,6 +52,10 @@ export const jest: Linter.Config[] = [
       },
     },
     rules: {
+      // local rule (issue #59; design-system #733/#772): test files
+      // must not read JS/TS source files — source-string pins protect
+      // spelling, not behavior. At 'warn' per the severity policy.
+      'no-source-reads-in-tests/no-source-reads-in-tests': 'warn',
       // relax line-length limits for test files (tests are naturally verbose)
       'max-lines': 'off',
       'max-lines-per-function': 'off',
