@@ -78,12 +78,15 @@ async function packAndInstall(scratch: string) {
       type: 'module',
     }),
   );
-  await installDeps(consumer, path.join(scratch, packed));
+  await installDeps(consumer, path.join(scratch, packed), [
+    'eslint@^10.0.0',
+    'typescript@^7.0.2',
+  ]);
   await writeFile(path.join(consumer, 'runner.mjs'), RUNNER);
   return consumer;
 }
 
-async function installDeps(consumer: string, tarball: string) {
+async function installDeps(consumer: string, tarball: string, deps: string[]) {
   await run(
     'npm',
     [
@@ -93,8 +96,7 @@ async function installDeps(consumer: string, tarball: string) {
       '--ignore-scripts',
       '--loglevel=error',
       `file:${tarball}`,
-      'eslint@^10.0.0',
-      'typescript@^7.0.2',
+      ...deps,
     ],
     {cwd: consumer, timeout: 600_000},
   );
@@ -156,6 +158,95 @@ test(
         timeout: 120_000,
       });
       assertConsumerOutput(stdout);
+    } finally {
+      await rm(scratch, {recursive: true, force: true});
+    }
+  },
+);
+
+// Side-by-side consumer (issue #8, Stephen's 2026-11-24 direction):
+// npm `overrides` cannot substitute a peer dependency (verified
+// empirically — targeted and multi-parent alias overrides both still
+// dedupe the `typescript` peer to the consumer's TS 7), so the working
+// shape is a top-level alias: the consumer's resolvable `typescript`
+// IS @typescript/typescript6 for the lint runtime, and TypeScript 7
+// stays installed under the `typescript7` alias for compilation. This
+// test proves reactPending loads and its rules fire in that shape,
+// and that the TS 7 compiler is still runnable via its alias bin.
+const SIDE_BY_SIDE_RUNNER = `
+import ts from 'typescript';
+console.log('TS_VERSION', ts.version);
+const pending = await import('@spudly/eslint-config/react-pending');
+console.log('PENDING_LOADED', Array.isArray(pending.default ?? pending.reactPending));
+const {Linter} = await import('eslint');
+const linter = new Linter();
+const lang = {languageOptions: {parserOptions: {ecmaFeatures: {jsx: true}}, sourceType: 'module'}};
+const list = \`export const List = ({items}) => <ul>{items.map(i => <li>{i}</li>)}</ul>;
+\`;
+const messages = linter.verify(list, [lang, ...(pending.default ?? pending.reactPending)], {filename: 'List.jsx'});
+console.log('PENDING_RULE_IDS', [...new Set(messages.map(m => m.ruleId))].sort().join(','));
+`;
+
+test(
+  'TS7 side-by-side consumer: reactPending loads with typescript aliased to typescript6',
+  {timeout: 600_000},
+  async () => {
+    const scratch = await mkdtemp(path.join(repoRoot, '.tmp-ts7-sidebyside-'));
+    try {
+      await run(
+        'npm',
+        ['pack', '--pack-destination', scratch, '--loglevel=error'],
+        {cwd: repoRoot},
+      );
+      const entries = await readdir(scratch);
+      const packed = entries.find(f => f.endsWith('.tgz'));
+      assert.ok(packed, 'npm pack produced no tarball');
+      const consumer = path.join(scratch, 'consumer');
+      await run('mkdir', [consumer]);
+      await writeFile(
+        path.join(consumer, 'package.json'),
+        JSON.stringify({
+          name: 'ts7-side-by-side-consumer-fixture',
+          private: true,
+          type: 'module',
+        }),
+      );
+      await installDeps(consumer, path.join(scratch, packed), [
+        'eslint@^10.0.0',
+        'typescript@npm:@typescript/typescript6@^6.0.2',
+        'typescript7@npm:typescript@^7.0.2',
+      ]);
+      await writeFile(path.join(consumer, 'runner.mjs'), SIDE_BY_SIDE_RUNNER);
+      const {stdout} = await run('node', ['runner.mjs'], {
+        cwd: consumer,
+        timeout: 120_000,
+      });
+      assert.match(
+        outputLine(stdout, 'TS_VERSION') ?? '',
+        /^6\./,
+        `side-by-side fixture must resolve typescript6 for the lint runtime:\n${stdout}`,
+      );
+      assert.equal(
+        outputLine(stdout, 'PENDING_LOADED'),
+        'true',
+        `reactPending must load in the side-by-side shape:\n${stdout}`,
+      );
+      assert.ok(
+        (outputLine(stdout, 'PENDING_RULE_IDS') ?? '')
+          .split(',')
+          .includes('@eslint-react/no-missing-key'),
+        `reactPending rules must fire in the side-by-side shape:\n${stdout}`,
+      );
+      const {stdout: tscVersion} = await run(
+        'node',
+        ['node_modules/typescript7/bin/tsc', '--version'],
+        {cwd: consumer, timeout: 120_000},
+      );
+      assert.match(
+        tscVersion,
+        /Version 7\./,
+        'TypeScript 7 compiler must stay runnable under the typescript7 alias',
+      );
     } finally {
       await rm(scratch, {recursive: true, force: true});
     }
