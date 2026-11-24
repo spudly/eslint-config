@@ -322,6 +322,41 @@ deleted, and the full React rule set returns in every consumer with
 one package release. Restoration is tracked on issue #8 alongside
 the typescript-eslint watch.
 
+### TypeScript 7 consumers: the side-by-side setup (available now)
+
+Consumers on TypeScript 7 do not have to wait for that restore to use
+the `reactPending` rules. npm `overrides` cannot substitute a peer
+dependency (verified empirically for issue #8: targeted and
+multi-parent alias overrides both still dedupe the `typescript` peer
+to the consumer's TS 7), but a top-level alias works — the consumer's
+resolvable `typescript` is TypeScript 6 for the lint runtime, while
+TypeScript 7 stays installed under its own alias for compilation:
+
+```json
+{
+  "devDependencies": {
+    "typescript": "npm:@typescript/typescript6@^6.0.2",
+    "typescript7": "npm:typescript@^7.0.2"
+  },
+  "scripts": {
+    "typecheck": "node ./node_modules/typescript7/bin/tsc --noEmit"
+  }
+}
+```
+
+Both packages expose a `tsc` bin, so the plain `tsc` on PATH is the
+TypeScript 6 one; compilation and typechecking keep running on
+TypeScript 7 by invoking the aliased package's compiler by path,
+while ESLint (and the ts-api-utils / typescript-eslint API chain)
+resolves TypeScript 6.
+In this shape consumers may compose
+`@spudly/eslint-config/react-pending` alongside `react`. The
+side-by-side consumer fixture in `test/ts7Consumer.test.ts` proves
+the shape: `reactPending` loads, its `@eslint-react/no-missing-key`
+rule fires, and the aliased TypeScript 7 compiler still runs. When
+the upstream restore condition above is met, consumers drop the
+alias and return to a plain `typescript@^7` dependency.
+
 ## Known local-only pieces (not in this package)
 
 These stay in Eciperay when it adopts the shared config:
