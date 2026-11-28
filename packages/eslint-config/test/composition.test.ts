@@ -129,7 +129,10 @@ test('composition: typescript is a real typescript-eslint section (issue #67)', 
   assert.ok(typescript.length > 0);
   const [block] = typescript;
   assert.ok(block && block.plugins && '@typescript-eslint' in block.plugins);
-  assert.ok(block.languageOptions?.parser, 'typescript section sets the parser');
+  assert.ok(
+    block.languageOptions?.parser,
+    'typescript section sets the parser',
+  );
   assert.equal(
     effectiveSeverity(typescript, '@typescript-eslint/no-floating-promises'),
     'error',

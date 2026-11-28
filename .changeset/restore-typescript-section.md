@@ -1,5 +1,5 @@
 ---
-"@spudly/eslint-config": minor
+'@spudly/eslint-config': minor
 ---
 
 Restore the real `typescript` section under the side-by-side TypeScript 6 / TypeScript 7 shape (issue #67). The `./typescript` subpath (and the package root) now exports `typescript`: the typescript-eslint parser with `projectService` plus the full `@typescript-eslint/*` rule set ported from section 2 of Eciperay's pre-extraction config, instead of only the interim global ignores.
