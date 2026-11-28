@@ -13,6 +13,13 @@
 // no fixture. If a future composition change makes them effective,
 // this enumeration starts counting them and the coverage test in
 // ruleFixtures.test.ts demands their fixtures.
+// The restored `typescript` export (issue #67) is deliberately NOT
+// enumerated here: its type-aware rules need a real on-disk project
+// (projectService), which this probe harness cannot provide — a
+// snippet/virtual-file enumeration would report parse fatals, not
+// rule coverage. Its coverage lives in test/ts7Consumer.test.ts
+// (a real consumer project on disk) and in `npm run check-rules`,
+// which audits every @typescript-eslint rule for an explicit entry.
 import {ESLint} from 'eslint';
 
 import {

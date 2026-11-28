@@ -9,6 +9,7 @@ import {
   react,
   reactNative,
   tailwind,
+  typescript,
   typescriptPendingIgnores,
 } from '../dist/index.js';
 import reactPending from '../dist/react-pending.js';
@@ -51,6 +52,7 @@ const allExports = {
   reactNative,
   reactPending,
   tailwind,
+  typescript,
   typescriptPendingIgnores,
 };
 
@@ -80,6 +82,7 @@ test('the export surface is exactly the small list Stephen approved', async () =
     'react',
     'reactNative',
     'tailwind',
+    'typescript',
     'typescriptPendingIgnores',
   ]);
 });
