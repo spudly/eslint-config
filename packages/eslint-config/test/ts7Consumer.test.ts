@@ -112,7 +112,7 @@ const {ESLint} = await import('eslint');
 const eslint = new ESLint({overrideConfigFile: true, overrideConfig: [...section]});
 const results = await eslint.lintFiles(['src/sample.ts', 'src/sample.tsx']);
 for (const r of results) {
-  console.log('FILE', r.filePath.split('/').pop(), 'FATAL', r.messages.filter(m => m.fatal).length, 'RULES', [...new Set(r.messages.map(m => m.ruleId))].sort().join(','));
+  console.log('FILE', r.filePath.split('/').pop(), 'FATAL', r.messages.filter(m => m.fatal).length, 'RULES', [...new Set(r.messages.map(m => m.ruleId))].sort().join(','), 'MSGS', r.messages.map(m => m.message).join(' | '));
 }
 `;
 
@@ -147,6 +147,14 @@ test(
         'ts7-side-by-side-typescript-fixture',
       );
       await installSideBySide(consumer, tarball);
+      // The samples are enumerated in `files`, not `include`:
+      // @typescript/typescript6's project service does not surface
+      // .tsx files through include-glob expansion (verified
+      // empirically 2026-11-27 — an include pattern naming the .tsx
+      // file literally still leaves it "not found by the project
+      // service", while `files` works). A real consumer's tsconfig
+      // is theirs to shape; this fixture only needs both samples in
+      // the project so the type-aware rules can fire on each.
       await writeFile(
         path.join(consumer, 'tsconfig.json'),
         JSON.stringify({
@@ -158,7 +166,7 @@ test(
             jsx: 'react-jsx',
             noEmit: true,
           },
-          include: ['src'],
+          files: ['src/sample.ts', 'src/sample.tsx'],
         }),
       );
       await mkdir(path.join(consumer, 'src'));
