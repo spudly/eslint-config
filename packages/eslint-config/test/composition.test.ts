@@ -9,6 +9,7 @@ import {
   react,
   reactNative,
   tailwind,
+  typescript,
   typescriptPendingIgnores,
 } from '../dist/index.js';
 import reactPending from '../dist/react-pending.js';
@@ -75,6 +76,7 @@ test('composition: each export registers the plugins its rules need', () => {
     reactNative: ['react-native'],
     reactPending: ['@eslint-react'],
     tailwind: ['better-tailwindcss'],
+    typescript: ['@typescript-eslint'],
   };
   const byName = {
     base,
@@ -85,6 +87,7 @@ test('composition: each export registers the plugins its rules need', () => {
     reactNative,
     reactPending,
     tailwind,
+    typescript,
   };
   for (const [name, plugins] of Object.entries(expected)) {
     const actual = pluginNamespaces(byName[name as keyof typeof byName]);
@@ -119,6 +122,22 @@ test('composition: pending split — react ships hooks only, @eslint-react stays
     effectiveSeverity(react, 'react-hooks/rules-of-hooks'),
     'error',
     'the hooks signature rules survive the split at error',
+  );
+});
+
+test('composition: typescript is a real typescript-eslint section (issue #67)', () => {
+  assert.ok(typescript.length > 0);
+  const [block] = typescript;
+  assert.ok(block && block.plugins && '@typescript-eslint' in block.plugins);
+  assert.ok(block.languageOptions?.parser, 'typescript section sets the parser');
+  assert.equal(
+    effectiveSeverity(typescript, '@typescript-eslint/no-floating-promises'),
+    'error',
+    'type-aware signature rule survives the port at error',
+  );
+  assert.equal(
+    effectiveSeverity(typescript, '@typescript-eslint/require-await'),
+    'error',
   );
 });
 

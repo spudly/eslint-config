@@ -20,11 +20,11 @@
  *   react,
  *   reactNative,
  *   tailwind,
- *   typescriptPendingIgnores,
+ *   typescript,
  * } from '@spudly/eslint-config';
  *
  * export default [
- *   ...typescriptPendingIgnores, // until typescript-eslint supports TS7
+ *   ...typescript, // side-by-side TS6/TS7 shape (issue #67)
  *   ...base,
  *   ...react,
  *   ...reactNative,
@@ -63,4 +63,4 @@ export {default as noPageStyling} from './no-page-styling.js';
 export {default as react} from './react.js';
 export {default as reactNative} from './react-native.js';
 export {default as tailwind} from './tailwind.js';
-export {default as typescriptPendingIgnores} from './typescript.js';
+export {typescript, typescriptPendingIgnores} from './typescript.js';

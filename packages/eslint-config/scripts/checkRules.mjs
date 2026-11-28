@@ -35,7 +35,7 @@
  *   - A rule id whose plugin prefix is never registered by any export
  *     cannot be verified and is skipped in categories 1–2. The composed
  *     config carries such ids only as defensive 'off' entries for
- *     uninstalled plugins (e.g. the @typescript-eslint pending state).
+ *     uninstalled plugins (defensive 'off' entries).
  *   - The eslint-config-prettier block inside `base` is upstream-owned:
  *     its entire purpose is switching stylistic rules off (358 entries,
  *     including deprecated ones), so it is excluded from the Deprecated
@@ -83,6 +83,7 @@ const EXPORTS = [
   'react',
   'reactNative',
   'tailwind',
+  'typescript',
   'typescriptPendingIgnores',
 ];
 

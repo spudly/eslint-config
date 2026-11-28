@@ -27,19 +27,20 @@ import unicorn from './unicorn.js';
  * repo-layout `files:` globs, so scoped groups remain their own
  * exports and each consuming repo attaches its own paths.
  *
- * This export intentionally does NOT include the global TypeScript
- * ignores: until typescript-eslint supports TypeScript 7, TS files are
- * not linted anywhere. Consumers that want that behavior today add
- * `typescriptPendingIgnores` from '@spudly/eslint-config/typescript'
- * (see the README for the restore path).
+ * This export intentionally does NOT include the TypeScript section:
+ * consumers compose `typescript` from
+ * '@spudly/eslint-config/typescript' themselves (restored under the
+ * side-by-side TS6/TS7 shape, issue #67). The legacy
+ * `typescriptPendingIgnores` export remains on that subpath for
+ * consumers not yet on the side-by-side shape.
  */
 const baseCore: Linter.Config[] = [
   {
-    // typescript-eslint is uninstalled pending its TS7 support. Its rules
-    // are gone, so the inline eslint-disable directives naming
-    // @typescript-eslint/* rules no longer suppress anything; don't fail
-    // --max-warnings 0 on them until the plugin returns and the directives
-    // are live again.
+    // Consumers that do not compose the `typescript` section have no
+    // @typescript-eslint plugin registered, so inline eslint-disable
+    // directives naming @typescript-eslint/* rules suppress nothing for
+    // them; don't fail --max-warnings 0 on those directives. Consumers
+    // that do compose `typescript` get live directives again.
     linterOptions: {reportUnusedDisableDirectives: 'off'},
   },
 
@@ -106,7 +107,7 @@ const baseCore: Linter.Config[] = [
       'no-inner-declarations': 'off', // not applicable in ESM (hoisting rules differ)
       'no-invalid-regexp': 'error', // recommended
       'no-irregular-whitespace': 'error', // recommended
-      'no-loss-of-precision': 'off', // superseded by @typescript-eslint/no-loss-of-precision (off there too, TS handles it)
+      'no-loss-of-precision': 'off', // TS handles it (the @typescript-eslint extension was deprecated upstream and is not restored, #67)
       'no-misleading-character-class': 'error', // recommended
       'no-new-native-nonconstructor': 'error', // recommended
       'no-nonoctal-decimal-escape': 'error', // recommended

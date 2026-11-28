@@ -41,12 +41,12 @@ import {
   react,
   reactNative,
   tailwind,
-  typescriptPendingIgnores,
+  typescript,
 } from '@spudly/eslint-config';
 
 export default [
   // Repo-local ignores (dist, node_modules, generated code) go here.
-  ...typescriptPendingIgnores, // until typescript-eslint supports TS7
+  ...typescript, // typescript-eslint section (side-by-side shape, see below)
   ...base, // core + import-x + unicorn + CJS overrides + coverage-ignore
   ...react,
   ...reactNative,
@@ -92,14 +92,15 @@ below).
 | `noPageStyling`            | `@spudly/eslint-config/no-page-styling` | The ported `no-page-styling/no-page-styling` rule at `warn` (no direct Tamagui imports, no `className`, no inline `style` in scoped files, issue #60). **Rules only — no `files:` globs**; the consuming repo attaches its own page/view or app paths (see Usage and Custom rules)                                                                                                                                | design-system `eslintRules/noPageStyling.mjs` (#119/#297) |
 | `jest`                     | `@spudly/eslint-config/jest`            | eslint-plugin-jest for test/setup files (with the core/unicorn relaxations Eciperay applies in test scope), every rule explicit, plus the Oct 2026 additions held `off`, plus the ported `no-source-reads-in-tests/no-source-reads-in-tests` rule at `warn` (issue #59). Scoped by Jest naming conventions only (test/spec suffixes, `jest.setup*` filenames, `__tests__/`)                                       | Sections 7, 12 (jest part)                                |
 | `tailwind`                 | `@spudly/eslint-config/tailwind`        | eslint-plugin-better-tailwindcss (pinned 4.5.0, the version the source config was tuned against)                                                                                                                                                                                                                                                                                                                  | Sections 8, 8a                                            |
-| `typescriptPendingIgnores` | `@spudly/eslint-config/typescript`      | Global ignores for `*.ts`/`*.tsx`/`*.mts`/`*.cts` — the interim state while typescript-eslint lacks TS7 support (see below)                                                                                                                                                                                                                                                                                       | Top-of-file ignores block                                 |
+| `typescript`               | `@spudly/eslint-config/typescript`      | The real typescript-eslint section: parser (`projectService`) + every `@typescript-eslint/*` rule explicitly configured, restored under the side-by-side TS6/TS7 shape (issue #67, see below)                                                                                                                                                                                                                         | Section 2                                                 |
+| `typescriptPendingIgnores` | `@spudly/eslint-config/typescript`      | Global ignores for `*.ts`/`*.tsx`/`*.mts`/`*.cts` — **legacy/interim**, kept only for consumers not yet on the side-by-side shape (see below)                                                                                                                                                                                                                                                                             | Top-of-file ignores block                                 |
 
 ### Which repos use which subsets (planned adoption)
 
 - **Eciperay**: everything — it is the source of the rule sets.
-- **Memorize**: `typescriptPendingIgnores`, `base`, `react`,
+- **Memorize**: `typescript`, `base`, `react`,
   `reactNative`, `jest`. No server (no `node`), no Tailwind.
-- **Design system**: `typescriptPendingIgnores`, `base`, `react`.
+- **Design system**: `typescript`, `base`, `react`.
   A library, not an app: no `node`, no `jest` (tests run on
   `node --test`), no Tailwind, and the react-native app-screen rules
   don't fit library primitives.
@@ -239,9 +240,10 @@ Hand-written rules live in this package:
   generally, with carve-outs for Tamagui provider/theme bootstrap in
   app entry points settled in their own adoption plans. Per the
   severity policy the rule starts at `warn` and promotes to `error`
-  on/after 2026-12-21. Like the DS-local copy, it is dormant on
-  TS/TSX files until the TS lint restoration (issue #8) removes the
-  `typescriptPendingIgnores` block.
+  on/after 2026-12-21. Like the DS-local copy, it only fires on
+  TS/TSX files in consumers that compose the restored `typescript`
+  section (issue #67); under the legacy `typescriptPendingIgnores`
+  block those files are not linted at all.
 
 - **`no-source-reads-in-tests/no-source-reads-in-tests`** (part of
   `jest`, source `src/no-source-reads-in-tests-plugin.ts`, at
@@ -268,23 +270,81 @@ and Tamagui styling props. Tracked in
 [spudly/design-system#119](https://github.com/spudly/design-system/issues/119).
 Eciperay keeps its local section 10a copy until that rule exists.
 
-## TypeScript: the interim state and the restore path
+## TypeScript: the restored section and the side-by-side setup
 
-typescript-eslint was the only TS parser in these repos and is
-uninstalled everywhere pending its TypeScript 7 support, so TS files
-are currently **not linted at all** — `typecheck` (TS7) is the
-correctness gate. That behavior is the explicit, opt-in
-`typescriptPendingIgnores` export rather than something baked silently
-into `base`.
+The `typescript` export is a real typescript-eslint config section —
+parser plus the full `@typescript-eslint/*` rule set, ported from
+section 2 of Eciperay's pre-extraction config with severities and
+rationale comments preserved (reconciled against typescript-eslint
+8.74: rules deprecated upstream are dropped per the check-rules
+policy, and rules added since the port source carry explicit
+entries). It is **no longer gated on typescript-eslint shipping
+TypeScript 7 support** (issue #67, restored 2026-11-27).
 
-Restore path, when typescript-eslint ships TS7 support: this package
-gains a real `typescript` section (parser + `@typescript-eslint/*`
-rules, ported from the removed section 2 of Eciperay's config);
-consumers delete `typescriptPendingIgnores` from their arrays, and TS
-linting returns in all three repos with one package release. The core
-rules in `base` section 1 that are noted as "superseded by
-@typescript-eslint" stay as they are — they were configured for that
-return.
+Why it works today: typescript-eslint resolves the consumer's
+`typescript` package, and under the side-by-side shape that package
+is TypeScript 6 — `npm:@typescript/typescript6@^6.0.2`, which
+satisfies typescript-eslint's `typescript <6.1.0` peer cap — while
+compilation and typechecking run the TypeScript 7 compiler from the
+`typescript7` alias by path. The parser building its programs with
+the TS 6 API is the accepted trade-off of this shape (the same one
+`reactPending` uses for the @eslint-react chain). Verified: clean
+install with no peer warnings, type-aware rules
+(`@typescript-eslint/no-floating-promises`,
+`@typescript-eslint/require-await`) firing via `projectService`,
+and the TS 7 compiler still used for typecheck — all proven by the
+side-by-side consumer fixture in `test/ts7Consumer.test.ts`.
+
+### Consumer setup (the adoption step)
+
+Consumers adopting the restored section move to the side-by-side
+shape — mirroring the reactPending side-by-side docs below:
+
+```json
+{
+  "devDependencies": {
+    "typescript": "npm:@typescript/typescript6@^6.0.2",
+    "typescript7": "npm:typescript@^7.0.2"
+  },
+  "scripts": {
+    "typecheck": "node ./node_modules/typescript7/bin/tsc --noEmit"
+  }
+}
+```
+
+Both packages expose a `tsc` bin, so the plain `tsc` on PATH is the
+TypeScript 6 one; compilation and typechecking keep running on
+TypeScript 7 by invoking the aliased package's compiler by path,
+while ESLint (and the typescript-eslint API chain) resolves
+TypeScript 6. Then compose the section and remove the interim
+ignores:
+
+```ts
+import {typescript} from '@spudly/eslint-config';
+
+export default [
+  ...typescript, // replaces ...typescriptPendingIgnores
+  // ...base, and the rest of the composition
+];
+```
+
+The section sets `parserOptions: {projectService: true}` with no
+baked-in `tsconfigRootDir` (this package carries no repo-layout
+paths): the project service discovers each consumer's own tsconfig.
+Consumers whose layout needs it override `tsconfigRootDir` in a
+local block. The core rules in `base` section 1 that are noted as
+"superseded by @typescript-eslint" were configured for this return
+and stay as they are. A plain `typescript@^7` dependency (no alias)
+can no longer install this package — typescript-eslint's peer cap
+conflicts with it (npm ERESOLVE) — which is why the side-by-side
+move is the flagged adoption step in the restoring release's
+changeset.
+
+`typescriptPendingIgnores` remains available on the same subpath
+(named export, and from the package root) for any consumer not yet
+on the side-by-side shape, clearly marked **legacy/interim**:
+composing it means TS files are not linted at all. New consumers
+should not adopt it.
 
 ## React: the @eslint-react interim state and the restore path
 
@@ -504,4 +564,7 @@ run after that date.
 
 The `reactPending` export and `typescriptPendingIgnores` were
 checked as part of this audit: neither ships any rule at `'warn'`
-severity, so neither contributes an entry to the table.
+severity, so neither contributes an entry to the table. (The
+restored `typescript` export, issue #67, ships `'warn'` entries
+ported verbatim from Eciperay's section 2 — those are the source
+config's severities, not new-rule warnings under this policy.)

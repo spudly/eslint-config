@@ -6,11 +6,16 @@ import {
 // Dogfood: this repo lints its own JavaScript with the shared `base`
 // — which already contains import-x, unicorn, the CommonJS overrides,
 // and the coverage-ignore discipline — and holds its own comments to
-// that discipline. The test suite is TypeScript and typechecked (via the
-// package's tsconfig.test.json, run as part of `npm run typecheck`); TypeScript
-// sources — like every consumer right now — are not linted until
-// typescript-eslint supports TypeScript 7 (hence
-// typescriptPendingIgnores).
+// that discipline. The repo consumes the side-by-side TS6/TS7 shape
+// itself (issue #67): its resolvable `typescript` is TypeScript 6
+// (aliased to @typescript/typescript6) for the lint runtime, and
+// TypeScript 7 is installed under the `typescript7` alias (see
+// packages/eslint-config/package.json; the consumer fixture in
+// test/ts7Consumer.test.ts proves the TS7-by-path typecheck). This
+// repo's own TS sources are not yet linted with the restored
+// `typescript` section — they were written while TS linting was
+// off, so composing it here is a separate burn-down; the dogfood
+// lint therefore keeps `typescriptPendingIgnores` for now.
 export default [
   {ignores: ['**/dist/**', '**/node_modules/**']},
   ...typescriptPendingIgnores,

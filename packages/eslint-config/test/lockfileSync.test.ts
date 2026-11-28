@@ -50,6 +50,17 @@ test('semver range semantics used by the lockfile check', () => {
   assert.equal(satisfies('2.3.5', '1.2.3 - 2.3.4'), false);
 });
 
+// npm alias specs ("npm:@typescript/typescript6@^6.0.2",
+// "npm:typescript@^7.0.2" — the side-by-side TS6/TS7 shape, issue #67)
+// lock the aliased package's version under the alias's local name;
+// the range to satisfy is the part after the target package's '@'.
+function rangeOf(spec: string) {
+  if (!spec.startsWith('npm:')) return spec;
+  const target = spec.slice('npm:'.length);
+  const at = target.lastIndexOf('@');
+  return at > 0 ? target.slice(at + 1) : spec;
+}
+
 function staleEntries(manifest: Manifest, lockfile: Lockfile) {
   // Each section is checked separately: a package declared in both
   // must satisfy both specs, never just the later section's.
@@ -68,12 +79,32 @@ function staleEntries(manifest: Manifest, lockfile: Lockfile) {
         ?.version;
     if (!locked) {
       stale.push(`${name}: spec "${spec}" has no locked entry`);
-    } else if (!satisfies(locked, spec)) {
+    } else if (!satisfies(locked, rangeOf(spec))) {
       stale.push(`${name}: locked ${locked} does not satisfy "${spec}"`);
     }
   }
   return stale;
 }
+
+test('the checker unwraps npm: alias specs (side-by-side shape)', () => {
+  const manifest: Manifest = {
+    devDependencies: {
+      typescript: 'npm:@typescript/typescript6@^6.0.2',
+      typescript7: 'npm:typescript@^7.0.2',
+    },
+  };
+  const lockfile: Lockfile = {
+    packages: {
+      'node_modules/typescript': {version: '6.0.2'},
+      'node_modules/typescript7': {version: '7.0.2'},
+    },
+  };
+  assert.deepEqual(staleEntries(manifest, lockfile), []);
+  (lockfile.packages ??= {})['node_modules/typescript'] = {version: '5.9.3'};
+  assert.deepEqual(staleEntries(manifest, lockfile), [
+    'typescript: locked 5.9.3 does not satisfy "npm:@typescript/typescript6@^6.0.2"',
+  ]);
+});
 
 test('the checker reports missing and out-of-range locked entries', () => {
   const manifest: Manifest = {dependencies: {foo: '^1.0.0', bar: '^2.0.0'}};
